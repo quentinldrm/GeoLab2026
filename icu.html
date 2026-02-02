@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="fr" class="map-page">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Îlots de Chaleur - PNR Vosges du Nord</title>    <link rel="icon" type="image/png" href="Image/favicon.png">    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="map-page icu-page">
+
+    <nav class="floating-nav">
+        <a href="index.html" class="home-btn">
+            <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            Accueil
+        </a>
+        <a href="map.html" class="info-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2l7 19-7-6-7 6z"/>
+            </svg>
+            Cartographie LCZ
+        </a>
+        <a href="compare.html" class="info-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 20V10M12 20V4M6 20v-6"/>
+            </svg>
+            Comparaison
+        </a>
+        <button class="info-btn" onclick="openMethodologyModal()" aria-label="Méthodologie">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            Méthodologie
+        </button>
+        <button id="helpBtn" class="info-btn" title="Aide et tutoriel">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            Aide
+        </button>
+    </nav>
+
+    <!-- Tutoriel interactif -->
+    <div id="tutorialOverlay" class="tutorial-overlay hidden">
+        <div class="tutorial-modal">
+            <button id="closeTutorial" class="tutorial-close" title="Fermer">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            
+            <div class="tutorial-content">
+                <!-- Étape 1: Bienvenue -->
+                <div class="tutorial-step active" data-step="1">
+                    <div class="tutorial-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
+                        </svg>
+                    </div>
+                    <h2>Bienvenue sur les Îlots de Chaleur Urbains</h2>
+                    <p>Cette carte spécialisée présente l'<strong>intensité des îlots de chaleur</strong> calculée à partir des données LCZ.</p>
+                    <p class="tutorial-highlight">Identifiez les zones les plus vulnérables aux vagues de chaleur !</p>
+                </div>
+                
+                <!-- Étape 2: Sélection année -->
+                <div class="tutorial-step" data-step="2">
+                    <div class="tutorial-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                    </div>
+                    <h2>Choisissez une année</h2>
+                    <p>Le <strong>widget en haut à droite</strong> permet de sélectionner l'année d'analyse :</p>
+                    <ul class="tutorial-list">
+                        <li><strong>2015 à 2025</strong> - Évolution des îlots de chaleur</li>
+                        <li>Les couleurs changent selon l'intensité</li>
+                        <li>Du <strong>bleu (frais)</strong> au <strong>rouge (chaud)</strong></li>
+                    </ul>
+                </div>
+                
+                <!-- Étape 3: Recherche -->
+                <div class="tutorial-step" data-step="3">
+                    <div class="tutorial-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </div>
+                    <h2>Analysez une commune</h2>
+                    <p>La <strong>recherche en haut</strong> permet de localiser rapidement une zone :</p>
+                    <ul class="tutorial-list">
+                        <li>Tapez le nom de la commune</li>
+                        <li>Zoom automatique sur la zone</li>
+                        <li>Mise en évidence des limites</li>
+                        <li>Observez les <strong>variations d'intensité</strong> dans la commune</li>
+                    </ul>
+                </div>
+                
+                <!-- Étape 4: Légende -->
+                <div class="tutorial-step" data-step="4">
+                    <div class="tutorial-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <rect x="7" y="7" width="10" height="10"></rect>
+                        </svg>
+                    </div>
+                    <h2>Interprétez les couleurs</h2>
+                    <p>La <strong>légende en bas à droite</strong> indique l'intensité thermique :</p>
+                    <ul class="tutorial-list">
+                        <li><strong>Bleu/Vert</strong> - Zones fraîches (îlots de fraîcheur)</li>
+                        <li><strong>Jaune/Orange</strong> - Intensité modérée</li>
+                        <li><strong>Rouge/Bordeaux</strong> - Îlots de chaleur intenses</li>
+                    </ul>
+                    <p class="tutorial-highlight">Les zones rouges nécessitent des actions d'adaptation !</p>
+                </div>
+                
+                <!-- Étape 5: Statistiques -->
+                <div class="tutorial-step" data-step="5">
+                    <div class="tutorial-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                    </div>
+                    <h2>Analysez les statistiques</h2>
+                    <p>Le <strong>widget de statistiques en bas à gauche</strong> affiche :</p>
+                    <ul class="tutorial-list">
+                        <li><strong>Surface classée</strong> des zones ICU (varie selon la couverture)</li>
+                        <li><strong>Température moyenne</strong> estimée</li>
+                        <li><strong>Graphique</strong> de répartition par classe d'intensité</li>
+                        <li><strong>Tableau détaillé</strong> avec surfaces et écarts de température</li>
+                    </ul>
+                    <p>Les statistiques se mettent à jour automatiquement lors du changement d'année.</p>
+                </div>
+                
+                <!-- Étape 6: Utilisation -->
+                <div class="tutorial-step" data-step="6">
+                    <div class="tutorial-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Applications pratiques</h2>
+                    <p>Utilisez cette carte pour :</p>
+                    <ul class="tutorial-list">
+                        <li><strong>Aménagement urbain</strong> - Identifier les zones prioritaires</li>
+                        <li><strong>Végétalisation</strong> - Cibler les actions de plantation</li>
+                        <li><strong>Prévention</strong> - Plans canicule et santé publique</li>
+                        <li><strong>Planification</strong> - Projets de développement durable</li>
+                    </ul>
+                    <p class="tutorial-highlight">Contribuez à un territoire plus résilient !</p>
+                </div>
+            </div>
+            
+            <div class="tutorial-footer">
+                <div class="tutorial-progress">
+                    <span class="progress-dot active" data-step="1"></span>
+                    <span class="progress-dot" data-step="2"></span>
+                    <span class="progress-dot" data-step="3"></span>
+                    <span class="progress-dot" data-step="4"></span>
+                    <span class="progress-dot" data-step="5"></span>
+                    <span class="progress-dot" data-step="6"></span>
+                </div>
+                <div class="tutorial-buttons">
+                    <button id="prevStep" class="tutorial-btn secondary" disabled>Précédent</button>
+                    <label class="tutorial-checkbox">
+                        <input type="checkbox" id="dontShowAgain">
+                        <span>Ne plus afficher</span>
+                    </label>
+                    <button id="nextStep" class="tutorial-btn primary">Suivant</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="mapid"></div>
+
+    <!-- Barre de recherche flottante -->
+    <div class="search-widget">
+        <div class="search-wrapper">
+            <input type="text" id="searchInput" placeholder="Rechercher une commune..." aria-label="Rechercher une commune" autocomplete="off">
+            <div id="suggestionsList" class="suggestions-list"></div>
+        </div>
+        <button id="searchBtn" aria-label="Lancer la recherche">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+            </svg>
+        </button>
+        <button id="resetBtn" aria-label="Réinitialiser la sélection" title="Réinitialiser" style="margin-left: 5px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                <path d="M21 3v5h-5"></path>
+                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                <path d="M3 21v-5h5"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Widget Contrôles -->
+    <div class="map-widget layer-controls collapsed">
+        <div class="widget-header" onclick="toggleWidget('controlsWidget')">
+            <h3>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="4" y1="21" x2="4" y2="14"/>
+                    <line x1="4" y1="10" x2="4" y2="3"/>
+                    <line x1="12" y1="21" x2="12" y2="12"/>
+                    <line x1="12" y1="8" x2="12" y2="3"/>
+                    <line x1="20" y1="21" x2="20" y2="16"/>
+                    <line x1="20" y1="12" x2="20" y2="3"/>
+                    <line x1="1" y1="14" x2="7" y2="14"/>
+                    <line x1="9" y1="8" x2="15" y2="8"/>
+                    <line x1="17" y1="16" x2="23" y2="16"/>
+                </svg>
+                Contrôles
+            </h3>
+            <span class="widget-toggle-icon" id="controlsToggle">▼</span>
+        </div>
+        <div class="widget-content" id="controlsWidget">
+            <div class="control-group">
+                <label class="control-label">
+                    Opacité
+                    <span id="opacityValue">100%</span>
+                </label>
+                <input type="range" id="opacitySlider" min="0" max="100" value="100">
+            </div>
+            <div class="control-group">
+                <label class="control-label">Fond de carte</label>
+                <button id="basemapToggle">
+                    <svg id="basemapIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                    <span id="basemapLabel">Satellite</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Widget Coordonnées & Zoom -->
+    <div class="map-widget coords-zoom-widget collapsed">
+        <div class="widget-header" onclick="toggleWidget('coordsZoomWidget')">
+            <h3>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                </svg>
+                Position
+            </h3>
+            <span class="widget-toggle-icon" id="coordsZoomToggle">▼</span>
+        </div>
+        <div class="widget-content" id="coordsZoomWidget">
+            <div class="coords-info-line">
+                <span class="coords-label">Latitude:</span>
+                <span class="coords-value" id="coordsLat">-</span>
+            </div>
+            <div class="coords-info-line">
+                <span class="coords-label">Longitude:</span>
+                <span class="coords-value" id="coordsLon">-</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="loader" class="loader-overlay hidden">
+        <div class="spinner"></div>
+        <p>Chargement des données ICU...</p>
+    </div>
+
+    <div class="map-widget year-selector">
+        <div class="widget-header" onclick="toggleWidget('yearWidget')">
+            <h3>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                Année
+            </h3>
+            <span class="widget-toggle-icon" id="yearToggle">▼</span>
+        </div>
+        <div class="widget-content" id="yearWidget">
+            <div class="radio-group">
+            <label class="radio-option">
+
+                <input type="radio" name="year" value="2015" onchange="updateMap('2015', 'geoclimate')">
+                <span>2015</span>
+            </label>
+            <label class="radio-option">
+                <input type="radio" name="year" value="2020" onchange="updateMap('2020', 'geoclimate')">
+                <span>2020</span>
+            </label>
+            <label class="radio-option">
+                <input type="radio" name="year" value="2025" checked onchange="updateMap('2025', 'geoclimate')">
+                <span>2025</span>
+            </label>
+            <label class="radio-option">
+                <input type="radio" name="year" value="2025RF" onchange="updateMap('2025', 'rf')">
+                <span>RF 2025</span>
+            </label>
+        </div>
+        </div>
+    </div>
+
+    <div class="map-widget legend-box">
+        <div class="widget-header" onclick="toggleWidget('legendWidget')">
+            <h3>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
+                </svg>
+                Légende ICU (ΔT °C)
+            </h3>
+            <span class="widget-toggle-icon" id="legendToggle">▼</span>
+        </div>
+        <div class="widget-content" id="legendWidget">
+            <h4>Intensité de l'îlot de chaleur</h4>
+            <div class="legend-item"><span class="color-dot" style="background:#313695;"></span> &lt; -2°C (Très frais)</div>
+            <div class="legend-item"><span class="color-dot" style="background:#4575b4;"></span> -2 à -1°C (Frais)</div>
+            <div class="legend-item"><span class="color-dot" style="background:#74add1;"></span> -1 à -0.5°C</div>
+            <div class="legend-item"><span class="color-dot" style="background:#abd9e9;"></span> -0.5 à 0°C</div>
+            <div class="legend-item"><span class="color-dot" style="background:#e0f3f8;"></span> 0 à 0.5°C (Neutre)</div>
+            <div class="legend-item"><span class="color-dot" style="background:#ffffbf;"></span> 0.5 à 1°C</div>
+            <div class="legend-item"><span class="color-dot" style="background:#fee090;"></span> 1 à 1.5°C</div>
+            <div class="legend-item"><span class="color-dot" style="background:#fdae61;"></span> 1.5 à 2°C (Chaud)</div>
+            <div class="legend-item"><span class="color-dot" style="background:#f46d43;"></span> 2 à 3°C</div>
+            <div class="legend-item"><span class="color-dot" style="background:#d73027;"></span> 3 à 4°C (Très chaud)</div>
+            <div class="legend-item"><span class="color-dot" style="background:#a50026;"></span> &gt; 4°C (Extrême)</div>
+        </div>
+    </div>
+
+    <footer class="map-footer">
+        <div class="map-footer-left">
+            <span class="map-footer-logo">
+                <img src="Image/logo_pnr.webp" alt="Logo PNR" style="height: 32px; vertical-align: middle; margin-right: 8px;">
+                PNR Vosges du Nord
+            </span>
+            <span class="map-footer-info">Îlots de chaleur urbains - Intensité théorique</span>
+        </div>
+        <div class="map-footer-right">
+            <span class="map-metadata">
+                <span id="currentYear">2025 (RF)</span>
+            </span>
+            <span>© 2026 Université de Strasbourg</span>
+        </div>
+    </footer>
+
+    <!-- Modal Méthodologie -->
+    <div id="methodologyModal" class="lcz-modal" onclick="closeMethodologyModal(event)">
+        <div class="methodology-modal-content" onclick="event.stopPropagation()">
+            <button class="lcz-modal-close" onclick="closeMethodologyModal()" aria-label="Fermer">×</button>
+            <div class="methodology-header">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-leaf);">
+                    <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
+                </svg>
+                <h2>Méthodologie ICU théorique</h2>
+            </div>
+            <div class="methodology-body">
+                <div class="method-section highlight">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                        Principe du proxy ICU
+                    </h3>
+                    <p>L'<strong>intensité d'îlot de chaleur urbain (ICU)</strong> représente l'écart de température (ΔT) entre une zone et la température moyenne du territoire. Cette approche permet d'identifier les zones particulièrement chaudes ou fraîches.</p>
+                    <p><strong>⚠️ Important :</strong> Il s'agit d'un <strong>proxy</strong> (approximation) car le calcul réel des îlots de chaleur urbains est extrêmement complexe et nécessite des ressources importantes (modélisations atmosphériques, mesures de terrain continues, etc.). Cette méthode ne représente pas exactement la réalité thermique du territoire, mais <strong>tente de s'en rapprocher</strong> en utilisant les propriétés physiques des surfaces (bâti, végétation, sols) caractérisées par les LCZ.</p>
+                    <p>Le calcul est basé sur la <strong>classification LCZ</strong> (Local Climate Zones) et des valeurs de référence issues de la littérature scientifique.</p>
+                </div>
+
+                <div class="method-section">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                        </svg>
+                        Références scientifiques
+                    </h3>
+                    <ul>
+                        <li><strong>Stewart, I. D., & Oke, T. R. (2012).</strong> Local Climate Zones for Urban Temperature Studies. <em>Bulletin of the American Meteorological Society</em>, 93(12), 1879-1900.</li>
+                        <li><strong>Leconte, F., et al. (2015).</strong> Using Local Climate Zone scheme for UHI assessment: Evaluation of the method using mobile measurements. <em>Building and Environment</em>, 83, 39-49.</li>
+                    </ul>
+                    <p style="margin-top: 15px;"><strong>Données sources :</strong></p>
+                    <ul>
+                        <li><strong>2015-2025 GeoClimate :</strong> Attribut <code>ICU_theori</code> calculé par GeoClimate</li>
+                        <li><strong>2025 Random Forest :</strong> Attribut <code>UHI_Delta</code> calculé selon la même méthode</li>
+                    </ul>
+                </div>
+
+                <div class="method-section">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                        Interprétation
+                    </h3>
+                    <ul>
+                        <li><strong>ΔT < 0°C :</strong> Zones plus fraîches que la moyenne (forêts, plans d'eau, végétation dense)</li>
+                        <li><strong>ΔT ≈ 0°C :</strong> Zones neutres, proches de la température moyenne</li>
+                        <li><strong>ΔT > 0°C :</strong> Zones plus chaudes que la moyenne (urbain dense, surfaces imperméables)</li>
+                        <li><strong>ΔT > 2°C :</strong> Îlots de chaleur significatifs nécessitant une attention particulière</li>
+                    </ul>
+                </div>
+
+                <div class="method-section">
+                    <p style="margin-top: 15px;"><strong>Équipe projet :</strong> Master 2 OTG - Université de Strasbourg (2025-2026)<br>
+                    <small style="color: #888;">Morgane Carmier, Clément Friess, Quentin Ledermann, Ella THILL</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Methodology Modal -->
+    <div id="methodologyModal" class="tutorial-overlay" style="display: none;">
+        <div class="tutorial-modal" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid rgba(255,255,255,0.2); padding-bottom: 15px;">
+                <h2 style="margin: 0; font-size: 1.8em;">📚 Méthodologie ICU</h2>
+                <button onclick="closeMethodologyModal()" style="background: none; border: none; font-size: 2em; cursor: pointer; color: white; line-height: 1;">&times;</button>
+            </div>
+            
+            <div style="line-height: 1.6;">
+                <section style="margin-bottom: 30px;">
+                    <h3 style="color: #F44336; margin-bottom: 15px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="16" x2="12" y2="12"/>
+                            <line x1="12" y1="8" x2="12.01" y2="8"/>
+                        </svg>
+                        Calcul des Îlots de Chaleur Urbains
+                    </h3>
+                    <p>L'<strong>Îlot de Chaleur Urbain (ICU)</strong> désigne le phénomène d'élévation de la température en milieu urbain par rapport aux zones rurales environnantes. Cette différence de température est principalement causée par :</p>
+                    <ul style="margin-left: 20px;">
+                        <li><strong>L'imperméabilisation des sols</strong> (béton, asphalte)</li>
+                        <li><strong>La morphologie urbaine</strong> (hauteur des bâtiments, rues canyon)</li>
+                        <li><strong>La réduction de la végétation</strong></li>
+                        <li><strong>Les activités anthropiques</strong> (chauffage, climatisation, trafic)</li>
+                    </ul>
+                </section>
+
+                <section style="margin-bottom: 30px;">
+                    <h3 style="color: #2196F3; margin-bottom: 15px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                            <line x1="12" y1="22.08" x2="12" y2="12"/>
+                        </svg>
+                        Méthodologie de calcul
+                    </h3>
+                    <p><strong>1. Données de température de surface (LST)</strong></p>
+                    <p>Les températures de surface sont extraites des images satellitaires <strong>MODIS LST</strong> (Moderate Resolution Imaging Spectroradiometer) :</p>
+                    <ul style="margin-left: 20px;">
+                        <li><strong>Résolution spatiale</strong> : 1 km × 1 km</li>
+                        <li><strong>Résolution temporelle</strong> : passages journaliers (jour et nuit)</li>
+                        <li><strong>Période d'analyse</strong> : moyennes estivales (juin-août)</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>2. Température de référence rurale</strong></p>
+                    <p>La température de référence est calculée à partir des zones rurales identifiées par les classes LCZ suivantes :</p>
+                    <ul style="margin-left: 20px;">
+                        <li><strong>LCZ A</strong> : zones agricoles denses (cultures)</li>
+                        <li><strong>LCZ D</strong> : zones de végétation basse (prairies)</li>
+                        <li><strong>LCZ F</strong> : végétation clairsemée</li>
+                    </ul>
+                    <p>La <strong>moyenne des températures</strong> de ces zones constitue la température de référence rurale (T<sub>rural</sub>).</p>
+
+                    <p style="margin-top: 15px;"><strong>3. Calcul de l'intensité ICU</strong></p>
+                    <p>L'intensité de l'îlot de chaleur pour chaque pixel est calculée par la formule :</p>
+                    <p style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; text-align: center; font-family: monospace; font-size: 1.1em;">
+                        ICU = T<sub>surface</sub> - T<sub>rural</sub>
+                    </p>
+                    <p>Où :</p>
+                    <ul style="margin-left: 20px;">
+                        <li><strong>T<sub>surface</sub></strong> : température de surface du pixel considéré (°C)</li>
+                        <li><strong>T<sub>rural</sub></strong> : température de référence rurale (°C)</li>
+                        <li><strong>ICU</strong> : intensité de l'îlot de chaleur (°C)</li>
+                    </ul>
+                </section>
+
+                <section style="margin-bottom: 30px;">
+                    <h3 style="color: #FF9800; margin-bottom: 15px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                            <path d="M12 2v20M2 12h20"/>
+                            <path d="M6 6l6 6-6 6M18 6l-6 6 6 6"/>
+                        </svg>
+                        Classification de l'intensité
+                    </h3>
+                    <p>Les valeurs d'ICU sont classées en 5 catégories d'intensité :</p>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                        <tr style="background: rgba(255,255,255,0.1);">
+                            <th style="padding: 10px; border: 1px solid rgba(255,255,255,0.2); text-align: left;">Catégorie</th>
+                            <th style="padding: 10px; border: 1px solid rgba(255,255,255,0.2); text-align: left;">Intervalle (°C)</th>
+                            <th style="padding: 10px; border: 1px solid rgba(255,255,255,0.2); text-align: left;">Interprétation</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid rgba(255,255,255,0.2);">Très faible</td>
+                            <td style="padding: 10px; border: 1px solid rgba(255,255,255,0.2);">< 0°C</td>
+                            <td style="padding: 10px; border: 1px solid rgba(255,255,255,0.2);">Plus froid que la référence rurale</td>
+                        </tr>
+                        <tr style="background: rgba(255,255,255,0.05);">
+                            <td style="padding: 10px; border: 1px solid rgba(255,255,255,0.2);">Faible</td>
+                            <td style="padding: 10px; border: 1px solid rgba(255,255,255,0.2);">0 - 1°C</td>
+                            <td style="padding: 10px; border: 1px solid rgba(255,255,255,0.2);">ICU faible à modéré</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid rgba(255,255,255,0.2);">Modéré</td>
+                            <td style="padding: 10px; border: 1px solid rgba(255,255,255,0.2);">1 - 2°C</td>
+                            <td style="padding: 10px; border: 1px solid rgba(255,255,255,0.2);">ICU significatif</td>
+                        </tr>
+                        <tr style="background: rgba(255,255,255,0.05);">
+                            <td style="padding: 10px; border: 1px solid rgba(255,255,255,0.2);">Élevé</td>
+                            <td style="padding: 10px; border: 1px solid rgba(255,255,255,0.2);">2 - 3°C</td>
+                            <td style="padding: 10px; border: 1px solid rgba(255,255,255,0.2);">ICU fort</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid rgba(255,255,255,0.2);">Très élevé</td>
+                            <td style="padding: 10px; border: 1px solid rgba(255,255,255,0.2);">> 3°C</td>
+                            <td style="padding: 10px; border: 1px solid rgba(255,255,255,0.2);">ICU très intense</td>
+                        </tr>
+                    </table>
+                </section>
+
+                <section style="margin-bottom: 30px;">
+                    <h3 style="color: #9C27B0; margin-bottom: 15px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="12" y1="18" x2="12" y2="12"/>
+                            <line x1="12" y1="9" x2="12.01" y2="9"/>
+                        </svg>
+                        Limites de l'analyse
+                    </h3>
+                    <p><strong>Résolution spatiale grossière :</strong> Les données MODIS LST ont une résolution de 1 km, ce qui ne permet pas de capturer les variations fines à l'échelle du quartier.</p>
+                    <p><strong>Température de surface vs. température de l'air :</strong> La LST mesure la température de surface, qui peut différer significativement de la température de l'air ressentie par les habitants.</p>
+                    <p><strong>Variabilité temporelle :</strong> L'ICU varie au cours de la journée (maximum la nuit) et selon les saisons. Les moyennes estivales masquent cette variabilité.</p>
+                    <p><strong>Couverture nuageuse :</strong> Les mesures satellitaires sont affectées par la présence de nuages, réduisant le nombre de données disponibles.</p>
+                    <p><strong>Zones de référence :</strong> Le choix des zones rurales de référence influence directement le calcul de l'ICU.</p>
+                </section>
+
+                <section>
+                    <h3 style="color: #607D8B; margin-bottom: 15px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                            <polyline points="22,6 12,13 2,6"/>
+                        </svg>
+                        Références & Contact
+                    </h3>
+                    <p><strong>Références scientifiques :</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>Stewart, I. D., & Oke, T. R. (2012). Local Climate Zones for Urban Temperature Studies. <em>BAMS</em>, 93(12), 1879-1900.</li>
+                        <li>Wan, Z. (2008). New refinements and validation of the MODIS Land-Surface Temperature/Emissivity products. <em>Remote Sensing of Environment</em>, 112(1), 59-74.</li>
+                    </ul>
+                    <p style="margin-top: 15px;"><strong>Équipe projet :</strong><br>
+                    Master 2 OTG - Université de Strasbourg (2025-2026)<br>
+                    <small style="color: #aaa;">Morgane Carmier, Clément Friess, Quentin Ledermann, Ella THILL</small></p>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Widget Statistiques ICU -->
+    <div class="map-widget stats-widget collapsed">
+        <div class="widget-header" onclick="toggleWidget('statsWidget')">
+            <h3>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="20" x2="18" y2="10"/>
+                    <line x1="12" y1="20" x2="12" y2="4"/>
+                    <line x1="6" y1="20" x2="6" y2="14"/>
+                </svg>
+                Statistiques ICU
+            </h3>
+            <span class="widget-toggle-icon" id="statsToggle">▼</span>
+        </div>
+        <div class="widget-content" id="statsWidget">
+            <div id="statsLoading" class="stats-loading">
+                <div class="spinner-small"></div>
+                <p>Calcul en cours...</p>
+            </div>
+            <div id="statsContent" class="stats-content" style="display: none;">
+                <div class="stats-context" id="statsContext">
+                    <span class="stats-context-label">Zone analysée :</span>
+                    <span class="stats-context-value" id="statsContextValue">Parc Naturel Régional</span>
+                </div>
+                <div class="stats-summary">
+                    <div class="stat-item">
+                        <span class="stat-label">Surface classée</span>
+                        <span class="stat-value" id="totalArea">-</span>
+                        <span class="stat-note">Couverture variable selon l'année</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">ΔT moyen</span>
+                        <span class="stat-value" id="avgTemp">-</span>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="icuChart"></canvas>
+                </div>
+                <div class="stats-table-container">
+                    <table class="stats-table" id="statsTable">
+                        <thead>
+                            <tr>
+                                <th>Classe</th>
+                                <th>Surface (ha)</th>
+                                <th>%</th>
+                            </tr>
+                        </thead>
+                        <tbody id="statsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.vectorgrid@latest/dist/Leaflet.VectorGrid.bundled.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+    <script src="cache-manager.js"></script>
+    <script src="geojson-loader.js"></script>
+    <script src="preloader.js"></script>
+    <script src="common.js"></script>
+    <script src="stats_utils.js"></script>
+    <script src="script_icu.js"></script>
+    
+    <!-- Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./service-worker.js')
+                .then(() => console.log('✓ Service Worker registered'))
+                .catch(err => console.warn('Service Worker registration failed:', err));
+        }
+    </script>
+</body>
+</html>

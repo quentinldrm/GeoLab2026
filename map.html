@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="fr" class="map-page">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartographie LCZ - PNR Vosges du Nord</title>    <link rel="icon" type="image/png" href="Image/favicon.png">    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="map-page">
+
+    <nav class="floating-nav">
+        <a href="index.html" class="home-btn">
+            <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            Accueil
+        </a>
+        <a href="icu.html" class="info-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
+            </svg>
+            Îlots de Chaleur
+        </a>        <a href="compare.html" class="info-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 20V10M12 20V4M6 20v-6"/>
+            </svg>
+            Comparaison
+        </a>
+        <button class="info-btn" onclick="openMethodologyModal()" aria-label="Méthodologie">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            Méthodologie
+        </button>
+        <button id="helpBtn" class="info-btn" title="Aide et tutoriel">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            Aide
+        </button>
+    </nav>
+
+    <!-- Tutoriel interactif -->
+    <div id="tutorialOverlay" class="tutorial-overlay hidden">
+        <div class="tutorial-modal">
+            <button id="closeTutorial" class="tutorial-close" title="Fermer">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            
+            <div class="tutorial-content">
+                <!-- Étape 1: Bienvenue -->
+                <div class="tutorial-step active" data-step="1">
+                    <div class="tutorial-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                            <path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                        </svg>
+                    </div>
+                    <h2>Bienvenue sur la Cartographie LCZ</h2>
+                    <p>Ce tutoriel vous guidera à travers les principales fonctionnalités de visualisation des Zones Climatiques Locales (LCZ) du Parc Naturel Régional des Vosges du Nord.</p>
+                    <p class="tutorial-highlight">Les LCZ permettent de comprendre la structure thermique et urbaine du territoire.</p>
+                </div>
+                
+                <!-- Étape 2: Sélection année -->
+                <div class="tutorial-step" data-step="2">
+                    <div class="tutorial-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                    </div>
+                    <h2>Sélectionnez une année</h2>
+                    <p>Utilisez le <strong>widget en haut à droite</strong> pour choisir l'année de données LCZ à visualiser :</p>
+                    <ul class="tutorial-list">
+                        <li><strong>2015, 2020, 2025</strong> - Données GeoClimate</li>
+                        <li><strong>RF 2025</strong> - Prédiction par Random Forest</li>
+                    </ul>
+                    <p>Les données se chargent automatiquement après sélection.</p>
+                </div>
+                
+                <!-- Étape 3: Recherche commune -->
+                <div class="tutorial-step" data-step="3">
+                    <div class="tutorial-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </div>
+                    <h2>Recherchez une commune</h2>
+                    <p>Utilisez la <strong>barre de recherche en haut</strong> pour localiser rapidement une commune :</p>
+                    <ul class="tutorial-list">
+                        <li>Tapez le nom ou le code INSEE</li>
+                        <li>Sélectionnez dans la liste déroulante</li>
+                        <li>La carte zoome automatiquement</li>
+                        <li>Cliquez sur <strong>Réinitialiser</strong> pour revenir à la vue globale</li>
+                    </ul>
+                </div>
+                
+                <!-- Étape 4: Légende -->
+                <div class="tutorial-step" data-step="4">
+                    <div class="tutorial-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="9" y1="3" x2="9" y2="21"></line>
+                        </svg>
+                    </div>
+                    <h2>Consultez la légende</h2>
+                    <p>La <strong>légende en bas à droite</strong> explique les couleurs des zones :</p>
+                    <ul class="tutorial-list">
+                        <li><strong>Types bâtis (1-10)</strong> - Zones urbaines et construites</li>
+                        <li><strong>Types naturels (101-107)</strong> - Végétation, eau, sol nu</li>
+                    </ul>
+                    <p>Cliquez sur la légende pour l'ouvrir/fermer.</p>
+                </div>
+                
+                <!-- Étape 5: Statistiques -->
+                <div class="tutorial-step" data-step="5">
+                    <div class="tutorial-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                    </div>
+                    <h2>Analysez les statistiques</h2>
+                    <p>Le <strong>widget de statistiques en bas à gauche</strong> affiche :</p>
+                    <ul class="tutorial-list">
+                        <li><strong>Surface classée</strong> des zones LCZ (varie selon la couverture)</li>
+                        <li><strong>Nombre de types</strong> présents</li>
+                        <li><strong>Graphique</strong> de répartition par type</li>
+                        <li><strong>Tableau détaillé</strong> avec surfaces et pourcentages</li>
+                    </ul>
+                    <p>Les statistiques se mettent à jour automatiquement lors du changement d'année ou de source.</p>
+                </div>
+                
+                <!-- Étape 6: Navigation -->
+                <div class="tutorial-step" data-step="6">
+                    <div class="tutorial-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+                        </svg>
+                    </div>
+                    <h2>Explorez l'application</h2>
+                    <p>Découvrez les autres sections via le <strong>menu en haut</strong> :</p>
+                    <ul class="tutorial-list">
+                        <li><strong>Îlots de Chaleur</strong> - Visualisation des îlots de chaleur urbains</li>
+                        <li><strong>Comparaison</strong> - Comparez deux années côte à côte</li>
+                        <li><strong>Méthodologie</strong> - En savoir plus sur les données</li>
+                    </ul>
+                    <p class="tutorial-highlight">Bonne exploration des Zones climatiques locales !</p>
+                </div>
+            </div>
+            
+            <div class="tutorial-footer">
+                <div class="tutorial-progress">
+                    <span class="progress-dot active" data-step="1"></span>
+                    <span class="progress-dot" data-step="2"></span>
+                    <span class="progress-dot" data-step="3"></span>
+                    <span class="progress-dot" data-step="4"></span>
+                    <span class="progress-dot" data-step="5"></span>
+                    <span class="progress-dot" data-step="6"></span>
+                </div>
+                <div class="tutorial-buttons">
+                    <button id="prevStep" class="tutorial-btn secondary" disabled>Précédent</button>
+                    <label class="tutorial-checkbox">
+                        <input type="checkbox" id="dontShowAgain">
+                        <span>Ne plus afficher</span>
+                    </label>
+                    <button id="nextStep" class="tutorial-btn primary">Suivant</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="mapid"></div>
+
+    <!-- Barre de recherche flottante -->
+    <div class="search-widget">
+        <div class="search-wrapper">
+            <input type="text" id="searchInput" placeholder="Rechercher une commune..." aria-label="Rechercher une commune" autocomplete="off">
+            <div id="suggestionsList" class="suggestions-list"></div>
+        </div>
+        <button id="searchBtn" aria-label="Lancer la recherche">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+            </svg>
+        </button>
+        <button id="resetBtn" aria-label="Réinitialiser la sélection" title="Réinitialiser" style="margin-left: 5px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                <path d="M21 3v5h-5"></path>
+                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                <path d="M3 21v-5h5"></path>
+            </svg>
+        </button>
+    </div>
+
+    <div id="loader" class="loader-overlay hidden">
+        <div class="spinner"></div>
+        <p>Chargement des données LCZ...</p>
+    </div>
+
+    <div class="map-widget year-selector">
+        <div class="widget-header" onclick="toggleWidget('yearWidget')">
+            <h3>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                Année
+            </h3>
+            <span class="widget-toggle-icon" id="yearToggle">▼</span>
+        </div>
+        <div class="widget-content" id="yearWidget">
+            <div class="radio-group">
+                <label class="radio-option">
+
+                    <input type="radio" name="year" value="2015" onchange="updateMap('2015', 'geoclimate')">
+                    <span>2015</span>
+                </label>
+                <label class="radio-option">
+                    <input type="radio" name="year" value="2020" onchange="updateMap('2020', 'geoclimate')">
+                    <span>2020</span>
+                </label>
+                <label class="radio-option">
+                    <input type="radio" name="year" value="2025" checked onchange="updateMap('2025', 'geoclimate')">
+                    <span>2025</span>
+                </label>
+                <label class="radio-option">
+                    <input type="radio" name="year" value="2025RF" onchange="updateMap('2025', 'rf')">
+                    <span>RF 2025</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="map-widget legend-box">
+        <div class="widget-header" onclick="toggleWidget('legendWidget')">
+            <h3>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"/>
+                    <rect x="14" y="3" width="7" height="7"/>
+                    <rect x="14" y="14" width="7" height="7"/>
+                    <rect x="3" y="14" width="7" height="7"/>
+                </svg>
+                Légende LCZ
+            </h3>
+            <span class="widget-toggle-icon" id="legendToggle">▼</span>
+        </div>
+        <div class="widget-content" id="legendWidget">
+            <h4>Bâti</h4>
+            <div class="legend-item"><span class="color-dot" style="background:#8C0014;"></span> 1. Compact haute densité</div>
+            <div class="legend-item"><span class="color-dot" style="background:#D10000;"></span> 2. Compact moyenne densité</div>
+            <div class="legend-item"><span class="color-dot" style="background:#FF0000;"></span> 3. Compact basse densité</div>
+            <div class="legend-item"><span class="color-dot" style="background:#BF4D00;"></span> 4. Ouvert haute densité</div>
+            <div class="legend-item"><span class="color-dot" style="background:#FF9955;"></span> 5. Ouvert moyenne densité</div>
+            <div class="legend-item"><span class="color-dot" style="background:#FAEE05;"></span> 6. Ouvert basse densité</div>
+            <div class="legend-item"><span class="color-dot" style="background:#BCBCBC;"></span> 7. Léger basse densité</div>
+            <div class="legend-item"><span class="color-dot" style="background:#AAAAAA;"></span> 8. Large basse densité</div>
+            <div class="legend-item"><span class="color-dot" style="background:#FFDEAD;"></span> 9. Clairsemé</div>
+            <div class="legend-item"><span class="color-dot" style="background:#555555;"></span> 10. Industrie lourde</div>
+
+            <h4>Naturel</h4>
+            <div class="legend-item"><span class="color-dot" style="background:#006A18;"></span> A. Arbres denses</div>
+            <div class="legend-item"><span class="color-dot" style="background:#00AA00;"></span> B. Arbres dispersés</div>
+            <div class="legend-item"><span class="color-dot" style="background:#648525;"></span> C. Buissons, arbustes</div>
+            <div class="legend-item"><span class="color-dot" style="background:#B9DB79;"></span> D. Plantes basses</div>
+            <div class="legend-item"><span class="color-dot" style="background:#000000;"></span> E. Roche nue / pavé</div>
+            <div class="legend-item"><span class="color-dot" style="background:#FCE19A;"></span> F. Sol nu / sable</div>
+            <div class="legend-item"><span class="color-dot" style="background:#656BFA;"></span> G. Eau</div>
+        </div>
+    </div>
+
+    <!-- Widget Contrôles -->
+    <div class="map-widget layer-controls collapsed">
+        <div class="widget-header" onclick="toggleWidget('controlsWidget')">
+            <h3>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="4" y1="21" x2="4" y2="14"/>
+                    <line x1="4" y1="10" x2="4" y2="3"/>
+                    <line x1="12" y1="21" x2="12" y2="12"/>
+                    <line x1="12" y1="8" x2="12" y2="3"/>
+                    <line x1="20" y1="21" x2="20" y2="16"/>
+                    <line x1="20" y1="12" x2="20" y2="3"/>
+                    <line x1="1" y1="14" x2="7" y2="14"/>
+                    <line x1="9" y1="8" x2="15" y2="8"/>
+                    <line x1="17" y1="16" x2="23" y2="16"/>
+                </svg>
+                Contrôles
+            </h3>
+            <span class="widget-toggle-icon" id="controlsToggle">▼</span>
+        </div>
+        <div class="widget-content" id="controlsWidget">
+            <div class="control-group">
+                <label class="control-label">
+                    Opacité
+                    <span id="opacityValue">100%</span>
+                </label>
+                <input type="range" id="opacitySlider" min="0" max="100" value="100">
+            </div>
+            <div class="control-group">
+                <label class="control-label">Fond de carte</label>
+                <button id="basemapToggle">
+                    <svg id="basemapIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                    <span id="basemapLabel">Satellite</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Widget Coordonnées & Zoom -->
+    <div class="map-widget coords-zoom-widget collapsed">
+        <div class="widget-header" onclick="toggleWidget('coordsZoomWidget')">
+            <h3>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                </svg>
+                Position
+            </h3>
+            <span class="widget-toggle-icon" id="coordsZoomToggle">▼</span>
+        </div>
+        <div class="widget-content" id="coordsZoomWidget">
+            <div class="coords-info-line">
+                <span class="coords-label">Latitude:</span>
+                <span class="coords-value" id="coordsLat">-</span>
+            </div>
+            <div class="coords-info-line">
+                <span class="coords-label">Longitude:</span>
+                <span class="coords-value" id="coordsLon">-</span>
+            </div>
+            <div class="scale-info-line">
+                <span class="scale-label">Échelle:</span>
+                <span class="scale-value" id="mapScale">-</span>
+            </div>
+        </div>
+    </div>
+
+    <footer class="map-footer">
+        <div class="map-footer-left">
+            <span class="map-footer-logo">
+                <img src="Image/logo_pnr.webp" alt="Logo PNR" style="height: 32px; vertical-align: middle; margin-right: 8px;">
+                PNR Vosges du Nord
+            </span>
+            <span class="map-footer-info">Cartographie des zones climatiques locales</span>
+        </div>
+        <div class="map-footer-right">
+            <span class="map-metadata">
+                <span id="currentYear">2025</span>
+            </span>
+            <span>© 2026 Université de Strasbourg</span>
+        </div>
+    </footer>
+
+    <!-- Modal Description LCZ -->
+    <div class="lcz-modal" id="lczModal" onclick="closeLczModal(event)">
+        <div class="lcz-modal-content" onclick="event.stopPropagation()">
+            <button class="lcz-modal-close" onclick="closeLczModal()" aria-label="Fermer">×</button>
+            <div class="lcz-modal-header">
+                <div class="lcz-modal-color" id="modalColor"></div>
+                <div class="lcz-modal-title">
+                    <h2 id="modalTitle">Titre LCZ</h2>
+                    <div class="lcz-modal-code" id="modalCode">Code LCZ</div>
+                </div>
+            </div>
+            <div class="lcz-modal-body" id="modalBody">
+                <!-- Contenu dynamique -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Méthodologie -->
+    <div id="methodologyModal" class="lcz-modal" onclick="closeMethodologyModal(event)">
+        <div class="methodology-modal-content" onclick="event.stopPropagation()">
+            <button class="lcz-modal-close" onclick="closeMethodologyModal()" aria-label="Fermer">×</button>
+            <div class="methodology-header">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-leaf);">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+                <h2>Méthodologie de génération des LCZ</h2>
+            </div>
+            <div class="methodology-body">
+                <div class="method-section">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        LCZ 2015, 2020 - GeoClimate
+                    </h3>
+                    <p>Les couches (2015, 2020) ont été générées à l'aide de <strong>GeoClimate</strong>, une chaîne de traitement open-source développée par le CNRS.</p>
+                    <ul>
+                        <li><strong>Données en entrée :</strong> Base de données topographiques IGN (BD TOPO), OpenStreetMap</li>
+                        <li><strong>Méthode :</strong> Analyse morphologique du bâti et de l'occupation du sol</li>
+                        <li><strong>Indicateurs calculés :</strong> Fraction bâtie, hauteur moyenne, espacement, rugosité, perméabilité</li>
+                        <li><strong>Classification :</strong> Algorithme de décision basé sur les seuils définis par Stewart & Oke (2012)</li>
+                    </ul>
+                </div>
+
+                <div class="method-section highlight">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <circle cx="12" cy="12" r="4"></circle>
+                            <line x1="4.93" y1="4.93" x2="9.17" y2="9.17"></line>
+                            <line x1="14.83" y1="14.83" x2="19.07" y2="19.07"></line>
+                            <line x1="14.83" y1="9.17" x2="19.07" y2="4.93"></line>
+                            <line x1="14.83" y1="9.17" x2="18.36" y2="5.64"></line>
+                            <line x1="4.93" y1="19.07" x2="9.17" y2="14.83"></line>
+                        </svg>
+                        LCZ 2025 - Machine Learning (Random Forest)
+                    </h3>
+                    <p>La couche 2025 utilise une approche innovante par <strong>apprentissage automatique</strong> (Random Forest) sur un carroyage de 100m.</p>
+                    <ul>
+                        <li><strong>Données en entrée :</strong> Lidar HD (IGN), Orthophotographie IRC (infrarouge couleur), OCS GE (Occupation du sol à grande échelle)</li>
+                        <li><strong>Variables calculées :</strong> 15 variables dérivées des données sources (hauteur, densité, occupation, indices spectraux)</li>
+                        <li><strong>Entraînement :</strong> Modèle Random Forest entraîné sur un set de validation</li>
+                        <li><strong>Prédiction :</strong> Classification sur carroyage régulier de 100m × 100m</li>
+                        <li><strong>Avantage :</strong> Résolution homogène et actualisation rapide avec données de télédétection haute résolution</li>
+                    </ul>
+                </div>
+
+                <div class="method-section">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        Référence scientifique
+                    </h3>
+                    <p><strong>Stewart, I. D., & Oke, T. R. (2012).</strong> Local Climate Zones for Urban Temperature Studies. <em>Bulletin of the American Meteorological Society</em>, 93(12), 1879-1900.</p>
+                    <p style="margin-top: 15px;"><strong>Équipe projet :</strong> Master 2 OTG - Université de Strasbourg (2025-2026)<br>
+                    <small style="color: #888;">Morgane Carmier, Clément Friess, Quentin Ledermann, Ella THILL</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Widget Statistiques -->
+    <div class="map-widget stats-widget collapsed">
+        <div class="widget-header" onclick="toggleWidget('statsWidget')">
+            <h3>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="20" x2="18" y2="10"/>
+                    <line x1="12" y1="20" x2="12" y2="4"/>
+                    <line x1="6" y1="20" x2="6" y2="14"/>
+                </svg>
+                Statistiques LCZ
+            </h3>
+            <span class="widget-toggle-icon" id="statsToggle">▼</span>
+        </div>
+        <div class="widget-content" id="statsWidget">
+            <div id="statsLoading" class="stats-loading">
+                <div class="spinner-small"></div>
+                <p>Calcul en cours...</p>
+            </div>
+            <div id="statsContent" class="stats-content" style="display: none;">
+                <div class="stats-context" id="statsContext">
+                    <span class="stats-context-label">Zone analysée :</span>
+                    <span class="stats-context-value" id="statsContextValue">Parc Naturel Régional</span>
+                </div>
+                <div class="stats-summary"><div class="stat-item">
+                        <span class="stat-label">Surface classée</span>
+                        <span class="stat-value" id="totalArea">-</span>
+                        <span class="stat-note">Couverture variable selon l'année</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Nombre de types</span>
+                        <span class="stat-value" id="typesCount">-</span>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="lczChart"></canvas>
+                </div>
+                <div class="stats-table-container">
+                    <table class="stats-table" id="statsTable">
+                        <thead>
+                            <tr>
+                                <th>Type LCZ</th>
+                                <th>Surface (ha)</th>
+                                <th>%</th>
+                            </tr>
+                        </thead>
+                        <tbody id="statsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.vectorgrid@latest/dist/Leaflet.VectorGrid.bundled.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7.0.0/turf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+    <script src="cache-manager.js"></script>
+    <script src="geojson-loader.js"></script>
+    <script src="preloader.js"></script>
+    <script src="common.js"></script>
+    <script src="stats_utils.js"></script>
+    <script src="script_map.js"></script>
+    
+    <!-- Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./service-worker.js')
+                .then(() => console.log('✓ Service Worker registered'))
+                .catch(err => console.warn('Service Worker registration failed:', err));
+        }
+    </script>
+</body>
