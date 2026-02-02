@@ -777,11 +777,11 @@ async function loadGeojsonForStats(year) {
     const filename = source === 'rf' 
         ? `../data/LCZ${actualYear}_RF_4326.geojson.gz`
         : `../data/LCZ${actualYear}_4326.geojson.gz`;
+    const cacheKey = `${actualYear}_${source}`;
     
     try {
-        const res = await fetch(filename);
-        if (!res.ok) throw new Error('File not found');
-        return await res.json();
+        // Utiliser le même loader que pour les cartes
+        return await window.geojsonLoader.loadGeoJSON(filename, cacheKey);
     } catch (err) {
         console.error(`Error loading ${filename}:`, err);
         return null;
@@ -823,14 +823,27 @@ async function updateMapsWithStats() {
 // INITIAL LOAD
 // ==================================================
 
-// Initialiser le cache puis charger les cartes
-window.cacheManager.init().then(() => {
-    console.log('✓ Cache initialized');
-    updateMapsWithStats();
-}).catch(err => {
-    console.warn('Cache init failed, continuing without cache:', err);
-    updateMapsWithStats();
-});
+// Attendre que tout soit chargé
+function initializeApp() {
+    // Vérifier que toutes les dépendances sont disponibles
+    if (!window.cacheManager || !window.geojsonLoader || !window.MapUtils) {
+        console.log('Waiting for dependencies...');
+        setTimeout(initializeApp, 100);
+        return;
+    }
+    
+    // Initialiser le cache puis charger les cartes
+    window.cacheManager.init().then(() => {
+        console.log('✓ Cache initialized');
+        updateMapsWithStats();
+    }).catch(err => {
+        console.warn('Cache init failed, continuing without cache:', err);
+        updateMapsWithStats();
+    });
+}
+
+// Démarrer l'initialisation
+initializeApp();
 
 // ==================================================
 // ACCESSIBILITY - KEYBOARD SHORTCUTS

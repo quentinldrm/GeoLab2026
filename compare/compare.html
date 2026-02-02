@@ -444,11 +444,14 @@
     
     <!-- Service Worker -->
     <script>
+        // Service worker désactivé temporairement pour debug
+        /*
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('../utils/service-worker.js')
                 .then(() => console.log('✓ Service Worker registered'))
                 .catch(err => console.warn('Service Worker registration failed:', err));
         }
+        */
     </script>
 </body>
 </html>
