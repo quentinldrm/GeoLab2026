@@ -35,9 +35,9 @@ class DataPreloader {
         try {
             const source = year === '2025_RF' ? 'rf' : 'geoclimate';
             const actualYear = year === '2025_RF' ? '2025' : year;
-            const filename = source === 'rf' 
-                ? `Data/LCZ${actualYear}_RF_4326.geojson.gz`
-                : `Data/LCZ${actualYear}_4326.geojson.gz`;
+            const filename = source === 'rf'
+                ? `../data/LCZ${actualYear}_RF_4326.geojson.gz`
+                : `../data/LCZ${actualYear}_4326.geojson.gz`;
             const cacheKey = `${actualYear}_${source}`;
             
             // Vérifier si déjà en cache

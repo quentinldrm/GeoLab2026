@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comparaison Temporelle - LCZ PNR Vosges du Nord</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../style.css">
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -20,20 +20,20 @@
 
     <!-- Navigation flottante -->
     <nav class="floating-nav">
-        <a href="index.html" class="home-btn">
+        <a href="../index.html" class="home-btn">
             <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
                 <polyline points="9 22 9 12 15 12 15 22"/>
             </svg>
             Accueil
         </a>
-        <a href="map.html" class="info-btn">
+        <a href="../map/map.html" class="info-btn">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 2l7 19-7-6-7 6z"/>
             </svg>
             Cartographie LCZ
         </a>
-        <a href="icu.html" class="info-btn">
+        <a href="../icu/icu.html" class="info-btn">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
             </svg>
@@ -414,7 +414,7 @@
     <footer class="map-footer">
         <div class="map-footer-left">
             <span class="map-footer-logo">
-                <img src="Image/logo_pnr.webp" alt="Logo PNR" style="height: 32px; vertical-align: middle; margin-right: 8px;">
+                <img src="../pictures/logo_pnr.webp" alt="Logo PNR" style="height: 32px; vertical-align: middle; margin-right: 8px;">
                 PNR Vosges du Nord
             </span>
             <span class="map-footer-info">Comparaison temporelle des zones climatiques locales</span>
@@ -435,17 +435,17 @@
     <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7.0.0/turf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-    <script src="cache-manager.js"></script>
-    <script src="geojson-loader.js"></script>
-    <script src="preloader.js"></script>
-    <script src="common.js"></script>
-    <script src="stats_utils.js"></script>
+    <script src="../utils/cache-manager.js"></script>
+    <script src="../utils/geojson-loader.js"></script>
+    <script src="../utils/preloader.js"></script>
+    <script src="../utils/common.js"></script>
+    <script src="../utils/stats_utils.js"></script>
     <script src="script_compare.js"></script>
     
     <!-- Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./service-worker.js')
+            navigator.serviceWorker.register('../utils/service-worker.js')
                 .then(() => console.log('✓ Service Worker registered'))
                 .catch(err => console.warn('Service Worker registration failed:', err));
         }

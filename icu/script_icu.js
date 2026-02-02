@@ -35,12 +35,6 @@ let currentOpacity = 1.0;
 let icuChart = null;
 let currentData = null;
 
-// Cache pour éviter de recharger les données
-const dataCache = new Map();
-
-// Performance settings
-const SIMPLIFY_TOLERANCE = 0.00005; // Simplification très légère
-
 // ==================================================
 // MAP INITIALIZATION
 // ==================================================
@@ -48,7 +42,7 @@ const SIMPLIFY_TOLERANCE = 0.00005; // Simplification très légère
 const map = MapUtils.createMap('mapid');
 
 // Load PNR boundary
-fetch('Data/PNR_VN_4326.geojson')
+fetch('../data/PNR_VN_4326.geojson')
     .then(res => res.json())
     .then(data => {
         pnrLayer = L.geoJSON(data, {
@@ -78,8 +72,8 @@ function updateMap(year, source = 'geoclimate') {
     }
     
     const filename = source === 'rf' 
-        ? `Data/LCZ${year}_RF_4326.geojson.gz`
-        : `Data/LCZ${year}_4326.geojson.gz`;
+        ? `../data/LCZ${year}_RF_4326.geojson.gz`
+        : `../data/LCZ${year}_4326.geojson.gz`;
     
     const icuAttribute = source === 'rf' ? 'UHI_Delta' : 'ICU_theori';
     const cacheKey = `${year}_${source}`;
@@ -406,7 +400,7 @@ let selectedCommuneLayer = null;
 let dimOverlay = null;
 
 // Load communes data
-fetch('Data/COMMUNES_PNR.geojson')
+fetch('../data/COMMUNES_PNR.geojson')
     .then(res => res.json())
     .then(data => {
         communesData = data.features;

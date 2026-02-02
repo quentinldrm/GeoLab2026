@@ -16,18 +16,6 @@ let currentOpacity = 1.0;
 let lczChart = null;
 let currentData = null;
 
-// Cache pour éviter de recharger les données
-const dataCache = new Map();
-
-// Web Worker pour parsing
-let geojsonWorker = null;
-if (typeof Worker !== 'undefined') {
-    geojsonWorker = new Worker('geojson-worker.js');
-}
-
-// Performance settings
-const SIMPLIFY_TOLERANCE = 0.00005; // Simplification très légère des géométries
-
 // ==================================================
 // MAP INITIALIZATION
 // ==================================================
@@ -35,7 +23,7 @@ const SIMPLIFY_TOLERANCE = 0.00005; // Simplification très légère des géomé
 const map = MapUtils.createMap('mapid');
 
 // Load PNR boundary
-fetch('Data/PNR_VN_4326.geojson')
+fetch('../data/PNR_VN_4326.geojson')
     .then(res => res.json())
     .then(data => {
         pnrLayer = L.geoJSON(data, {
@@ -65,8 +53,8 @@ function updateMap(year, source = 'geoclimate') {
     }
     
     const filename = source === 'rf' 
-        ? `Data/LCZ${year}_RF_4326.geojson.gz`
-        : `Data/LCZ${year}_4326.geojson.gz`;
+        ? `../data/LCZ${year}_RF_4326.geojson.gz`
+        : `../data/LCZ${year}_4326.geojson.gz`;
     
     const lczAttribute = source === 'rf' ? 'LCZ' : 'LCZ_PRIMAR';
     const cacheKey = `${year}_${source}`;
@@ -84,36 +72,6 @@ function updateMap(year, source = 'geoclimate') {
             Loader.hide();
             alert(`Erreur de chargement : ${filename}`);
         });
-}
-
-// Fonction de simplification de géométries (Douglas-Peucker simplifié)
-function simplifyRing(ring, tolerance) {
-    if (ring.length <= 4) return ring;
-    
-    // Pour les petits anneaux, ne pas simplifier
-    if (ring.length < 50) return ring;
-    
-    // Simplification Douglas-Peucker basique
-    const simplified = [ring[0]];
-    let prevPoint = ring[0];
-    
-    for (let i = 1; i < ring.length - 1; i++) {
-        const point = ring[i];
-        const dx = Math.abs(point[0] - prevPoint[0]);
-        const dy = Math.abs(point[1] - prevPoint[1]);
-        
-        // Garder le point si la distance est significative
-        if (dx > tolerance || dy > tolerance) {
-            simplified.push(point);
-            prevPoint = point;
-        }
-    }
-    
-    // Toujours garder le dernier point (fermeture du polygone)
-    simplified.push(ring[ring.length - 1]);
-    
-    // Vérifier qu'on a au moins 4 points
-    return simplified.length >= 4 ? simplified : ring;
 }
 
 // Fonction pour créer la couche LCZ
@@ -341,7 +299,7 @@ let selectedCommuneLayer = null;
 let dimOverlay = null;
 
 // Load communes data
-fetch('Data/COMMUNES_PNR.geojson')
+fetch('../data/COMMUNES_PNR.geojson')
     .then(res => res.json())
     .then(data => {
         communesData = data.features;

@@ -846,7 +846,7 @@ html.map-page, body.map-page {
 /* Le conteneur de la carte Leaflet */
 .leaflet-bottom.leaflet-left {
     bottom: 60px !important;
-    left: 15px !important;
+    left: 20px !important;
 }
 
 #mapid {
@@ -2665,7 +2665,7 @@ html.map-page, body.map-page {
     
     /* Sur mobile, on cache le titre "Explorateur LCZ" pour gagner de la place */
     .map-title { display: none; }
-    .floating-nav { top: 10px; left: 10px; }
+    .floating-nav { top: 10px; left: 20px; }
     .home-btn { padding: 8px 15px; font-size: 0.8rem; }
     .legend-box { width: 90%; right: 5%; bottom: 90px; }
     .year-selector { 
@@ -4153,7 +4153,7 @@ html.map-page, body.map-page {
         gap: 10px;
         padding: 10px 15px;
         top: 15px;
-        left: 15px;
+        left: 20px;
     }
     
     .floating-nav a,

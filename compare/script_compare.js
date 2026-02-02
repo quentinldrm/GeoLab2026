@@ -15,12 +15,6 @@ let currentRightYear = '2025';
 let syncingMaps = false;
 let pnrLayer = null;
 
-// Cache pour éviter de recharger les données
-const dataCache = new Map();
-
-// Performance settings
-const SIMPLIFY_TOLERANCE = 0.00005; // Simplification très légère
-
 const mapCenter = [48.9, 7.4];
 const mapZoom = 11;
 
@@ -58,8 +52,6 @@ const syncRightToLeft = throttle(() => {
 mapLeft.on('move', syncLeftToRight);
 mapRight.on('move', syncRightToLeft);
 
-// Controls only on left map
-L.control.zoom({ position: 'bottomleft' }).addTo(mapLeft);
 
 // Add base layers
 [mapLeft, mapRight].forEach(map => {
@@ -71,7 +63,7 @@ L.control.zoom({ position: 'bottomleft' }).addTo(mapLeft);
 });
 
 // Load PNR boundary
-fetch('Data/PNR_VN_4326.geojson')
+fetch('../data/PNR_VN_4326.geojson')
     .then(res => res.json())
     .then(data => {
         const style = { color: '#2d5016', weight: 3, fillOpacity: 0, dashArray: '10, 5' };
@@ -96,8 +88,8 @@ function loadLCZLayer(year, mapInstance, isLeft = true) {
         const source = year === '2025_RF' ? 'rf' : 'geoclimate';
         const actualYear = year === '2025_RF' ? '2025' : year;
         const filename = source === 'rf' 
-            ? `Data/LCZ${actualYear}_RF_4326.geojson.gz`
-            : `Data/LCZ${actualYear}_4326.geojson.gz`;
+            ? `../data/LCZ${actualYear}_RF_4326.geojson.gz`
+            : `../data/LCZ${actualYear}_4326.geojson.gz`;
         const lczAttribute = source === 'rf' ? 'LCZ' : 'LCZ_PRIMAR';
         const cacheKey = `${actualYear}_${source}`;
         
@@ -230,7 +222,7 @@ let dimOverlayRight = null;
 let selectedCommuneName = null;
 
 // Load communes data
-fetch('Data/COMMUNES_PNR.geojson')
+fetch('../data/COMMUNES_PNR.geojson')
     .then(res => res.json())
     .then(data => {
         communesData = data.features;
@@ -783,8 +775,8 @@ async function loadGeojsonForStats(year) {
     const source = year === '2025_RF' ? 'rf' : 'geoclimate';
     const actualYear = year === '2025_RF' ? '2025' : year;
     const filename = source === 'rf' 
-        ? `Data/LCZ${actualYear}_RF_4326.geojson`
-        : `Data/LCZ${actualYear}_4326.geojson`;
+        ? `../data/LCZ${actualYear}_RF_4326.geojson.gz`
+        : `../data/LCZ${actualYear}_4326.geojson.gz`;
     
     try {
         const res = await fetch(filename);

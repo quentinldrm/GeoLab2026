@@ -9,7 +9,7 @@ class GeoJSONLoader {
         this.worker = null;
         if (typeof Worker !== 'undefined') {
             try {
-                this.worker = new Worker('geojson-worker.js');
+                this.worker = new Worker('../utils/geojson-worker.js');
             } catch (err) {
                 console.warn('Worker non disponible:', err);
             }
