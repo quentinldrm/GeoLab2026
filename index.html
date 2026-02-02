@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LCZ - PNR Vosges du Nord</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Cartographie interactive des zones climatiques locales (LCZ) du Parc naturel régional des Vosges du Nord. Analyse de l'îlot de chaleur urbain et évolution 2015-2025.">
+    <meta name="keywords" content="LCZ, zones climatiques locales, îlot de chaleur urbain, PNR Vosges du Nord, climat urbain, GeoClimate, Random Forest">
+    <meta name="author" content="Université de Strasbourg - Master 2 OTG">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="LCZ - PNR Vosges du Nord">
+    <meta property="og:description" content="Exploration interactive des zones climatiques locales et îlots de chaleur du territoire">
+    <meta property="og:image" content="pictures/image_pnr.jpg">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="LCZ - PNR Vosges du Nord">
+    <meta property="twitter:description" content="Cartographie des zones climatiques locales du Parc naturel régional des Vosges du Nord">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/webp" href="pictures/logo_pnr.webp">
+    
+    <!-- External Resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="landing-page">
+
+    <nav class="navbar">
+        <div class="logo">Projet GeoLAB 2026</div>
+    </nav>
+
+    <header class="hero-section">
+        <div class="hero-content">
+            <span class="subtitle">Master 2 OTG • Université de Strasbourg</span>
+            <h1 class="hero-title">Zones Climatiques Locales<br>PNR des Vosges du Nord</h1>
+            <p class="hero-desc">Analyse climatique et classification standardisée du territoire.</p>
+            <a href="#introduction" class="scroll-btn">Découvrir le projet</a>
+        </div>
+    </header>
+
+    <section id="introduction" class="content-section light-bg">
+        <div class="container split-layout">
+            <div class="text-block">
+                <h2>Le PNR des Vosges du Nord</h2>
+                <div class="divider"></div>
+                <p>
+                    À cheval sur l'Alsace et la Lorraine, le <strong>Parc Naturel Régional des Vosges du Nord</strong> est un territoire 
+                    d'exception reconnu Réserve mondiale de biosphère par l'UNESCO depuis 1989. Couvrant plus de <strong>130 000 hectares</strong>, 
+                    il se caractérise par une immense forêt de piémont, plus de 30 châteaux forts médiévaux et une biodiversité 
+                    remarquable avec des espèces emblématiques comme le lynx boréal et le grand tétras.
+                </p>
+                <p>
+                    Dans le contexte du <strong>changement climatique</strong>, ce patrimoine naturel fait face à de nouveaux défis : 
+                    stress hydrique estival, vulnérabilité accrue des forêts et modification des écosystèmes. Comprendre la structure 
+                    thermique de ce territoire à travers l'analyse des Zones Climatiques Locales est devenu un enjeu majeur pour 
+                    l'aménagement durable et la préservation de ses milieux naturels.
+                </p>
+            </div>
+            <div class="image-block pnr-img">
+                <img src="pictures/image_pnr.jpg" alt="Image PNR">
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section dark-bg">
+        <div class="container split-layout reverse">
+            <div class="text-block">
+                <h2>Comprendre les Zones Climatiques Locales (LCZ)</h2>
+                <div class="divider"></div>
+                <p>
+                    Le système des <strong>Zones Climatiques Locales (LCZ)</strong>, développé par Stewart et Oke (2012), 
+                    est une classification standardisée internationalement reconnue pour étudier les îlots de chaleur urbains et ruraux. 
+                    Ce système offre un cadre méthodologique robuste pour analyser l'influence de la morphologie urbaine et de 
+                    l'occupation du sol sur le microclimat local.
+                </p>
+                <p>
+                    Il divise le paysage en <strong>17 classes distinctes</strong> : 10 types urbains (du bâti dense et haut aux zones 
+                    industrielles) et 7 types naturels (forêts, végétation basse, sols nus, zones aquatiques). Chaque classe est définie 
+                    par des propriétés de surface spécifiques telles que la hauteur des bâtiments, la densité de construction, la 
+                    perméabilité du sol et la couverture végétale, qui influencent directement la température de l'air et le confort thermique.
+                </p>
+                <p>
+                    Cette approche permet de cartographier précisément le comportement thermique des différentes zones du parc et 
+                    d'identifier les secteurs les plus vulnérables face aux vagues de chaleur. Elle constitue un outil essentiel 
+                    pour guider les stratégies d'adaptation climatique et d'aménagement du territoire, notamment en matière de 
+                    végétalisation, de gestion de l'eau et de planification urbaine durable.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="navigation-section">
+        <div class="container">
+            <h2>Explorer les données</h2>
+            <p class="section-subtitle">Accédez aux outils d'analyse et aux cartographies dynamiques.</p>
+            <div class="cards-grid">
+                <a href="map/map.html" class="nav-card">
+                    <div class="card-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                    </div>
+                    <h3>Cartographie Interactive</h3>
+                    <p>Explorez la carte des LCZ sur l'ensemble du territoire du PNR. Recherchez par commune et visualisez 5 années de données.</p>
+                    <span class="card-link">Voir la carte &rarr;</span>
+                </a>
+
+                <a href="icu/icu.html" class="nav-card">
+                    <div class="card-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
+                        </svg>
+                    </div>
+                    <h3>Îlots de Chaleur</h3>
+                    <p>Visualisation de l'intensité d'îlot de chaleur urbain (ICU) sur le territoire. Identifiez les zones à risque thermique.</p>
+                    <span class="card-link">Voir la carte &rarr;</span>
+                </a>
+
+                <a href="compare/compare.html" class="nav-card">
+                    <div class="card-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 20V10M12 20V4M6 20v-6"/>
+                        </svg>
+                    </div>
+                    <h3>Comparaison Temporelle</h3>
+                    <p>Comparez l'évolution des LCZ entre différentes années avec un slider interactif. Visualisez les changements.</p>
+                    <span class="card-link">Comparer &rarr;</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>Projet GeoLAB 2026</h4>
+                    <p>Cartographie des zones climatiques locales (LCZ) du Parc naturel régional des Vosges du Nord.</p>
+                    <p class="footer-context">Projet réalisé dans le cadre du Master 2 Observation de la Terre et Géomatique.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Équipe</h4>
+                    <ul class="team-list">
+                        <li>Morgane Carmier</li>
+                        <li>Clément Friess</li>
+                        <li>Quentin Ledermann</li>
+                        <li>Ella THILL</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Institution</h4>
+                    <p><strong>Université de Strasbourg</strong></p>
+                    <p>Master 2 OTG</p>
+                    <p>Faculté de Géographie et d'Aménagement</p>
+                    <p class="footer-date">Janvier 2026</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Liens</h4>
+                    <p><strong>PNR Vosges du Nord</strong></p>
+                    <p><a href="https://www.parc-vosges-nord.fr/" target="_blank" rel="noopener" class="footer-link">→ Site officiel</a></p>
+                    <p style="margin-top: 15px;"><strong>Code source</strong></p>
+                    <p><a href="https://github.com" target="_blank" rel="noopener" class="footer-link">→ GitHub</a></p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="copyright">© 2026 Université de Strasbourg - Master 2 OTG</p>
+                <p class="license">Données sous licence ouverte</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script_landing.js"></script>
+</body>
+</html>
