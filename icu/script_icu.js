@@ -182,6 +182,13 @@ function createICULayer(data, icuAttribute) {
         const rgb = hexToRgb(color);
         const rgbString = `${rgb.r}, ${rgb.g}, ${rgb.b}`;
 
+        // Calculer la luminosité de la couleur
+        const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+
+        // Pour les couleurs sombres
+        const bgOpacity1 = brightness < 180 ? 0.35 : 0.12;
+        const bgOpacity2 = brightness < 180 ? 0.20 : 0.06;
+
         // Assombrir les couleurs claires pour meilleure lisibilité
         const getDarkerColor = (hex) => {
             const r = parseInt(hex.slice(1, 3), 16);
@@ -217,7 +224,7 @@ function createICULayer(data, icuAttribute) {
             .setLatLng(e.latlng)
             .setContent(`
                 <div class="popup-icu-container">
-                    <div class="popup-icu-header" style="background: linear-gradient(135deg, rgba(${rgbString}, 0.12), rgba(${rgbString}, 0.06)); border-bottom-color: rgba(${rgbString}, 0.15);">
+                    <div class="popup-icu-header" style="background: linear-gradient(135deg, rgba(${rgbString}, ${bgOpacity1}), rgba(${rgbString}, ${bgOpacity2})); border-bottom-color: rgba(${rgbString}, 0.15);">
                         <div class="popup-icu-color" style="background: ${color};"></div>
                         <div class="popup-icu-info">
                             <div class="popup-icu-label" style="color: ${textColor};">Îlot de chaleur</div>
