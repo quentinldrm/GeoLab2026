@@ -60,24 +60,24 @@ fetch('../data/PNR_VN_4326.geojson')
 function updateMap(year, source = 'geoclimate') {
     currentYear = year;
     currentSource = source;
-    
+
     Loader.show('Chargement des données ICU...');
-    
+
     if (icuLayer) map.removeLayer(icuLayer);
-    
+
     // Update year display
     const yearDisplay = document.getElementById('currentYear');
     if (yearDisplay) {
         yearDisplay.textContent = source === 'rf' ? `${year} (RF)` : year;
     }
-    
-    const filename = source === 'rf' 
+
+    const filename = source === 'rf'
         ? `../data/LCZ${year}_RF_4326.geojson.gz`
         : `../data/LCZ${year}_4326.geojson.gz`;
-    
-    const icuAttribute = source === 'rf' ? 'UHI_Delta' : 'ICU_theori';
+
+    const icuAttribute = 'ICU_theori';
     const cacheKey = `${year}_${source}`;
-    
+
     // Utiliser le loader optimisé
     window.geojsonLoader.loadGeoJSON(filename, cacheKey)
         .then(data => {
@@ -96,29 +96,29 @@ function updateMap(year, source = 'geoclimate') {
 // Fonction de simplification de géométries
 function simplifyRing(ring, tolerance) {
     if (ring.length <= 4) return ring;
-    
+
     // Pour les petits anneaux, ne pas simplifier
     if (ring.length < 50) return ring;
-    
+
     // Simplification Douglas-Peucker basique
     const simplified = [ring[0]];
     let prevPoint = ring[0];
-    
+
     for (let i = 1; i < ring.length - 1; i++) {
         const point = ring[i];
         const dx = Math.abs(point[0] - prevPoint[0]);
         const dy = Math.abs(point[1] - prevPoint[1]);
-        
+
         // Garder le point si la distance est significative
         if (dx > tolerance || dy > tolerance) {
             simplified.push(point);
             prevPoint = point;
         }
     }
-    
+
     // Toujours garder le dernier point (fermeture du polygone)
     simplified.push(ring[ring.length - 1]);
-    
+
     // Vérifier qu'on a au moins 4 points
     return simplified.length >= 4 ? simplified : ring;
 }
@@ -129,11 +129,11 @@ function createICULayer(data, icuAttribute) {
         map.removeLayer(icuLayer);
         icuLayer = null;
     }
-    
+
     // Tolérance dynamique selon le niveau de zoom
     const zoom = map.getZoom();
     const tolerance = zoom > 14 ? 5 : zoom > 12 ? 8 : 12;
-    
+
     icuLayer = L.vectorGrid.slicer(data, {
         interactive: true,
         rendererFactory: L.svg.tile,
@@ -158,17 +158,17 @@ function createICULayer(data, icuAttribute) {
             }
         }
     });
-    
+
     icuLayer.on('click', e => {
         const deltaT = e.layer.properties[icuAttribute];
         const lczValue = e.layer.properties[currentSource === 'rf' ? 'LCZ' : 'LCZ_PRIMAR'];
         const lczName = MapUtils.lczNames[lczValue] || 'Non classé';
         const color = getICUColor(deltaT);
         const lczDisplay = lczValue >= 100 ? String.fromCharCode(64 + lczValue - 100) : lczValue;
-        
+
         const tempText = deltaT != null ? deltaT.toFixed(2) + ' °C' : 'N/A';
         const tempClass = deltaT != null ? (deltaT > 2 ? 'high' : deltaT > 1 ? 'medium' : 'low') : 'na';
-        
+
         // Convertir hex en RGB pour les styles avec opacité
         const hexToRgb = (hex) => {
             const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -176,12 +176,12 @@ function createICULayer(data, icuAttribute) {
                 r: parseInt(result[1], 16),
                 g: parseInt(result[2], 16),
                 b: parseInt(result[3], 16)
-            } : {r: 255, g: 255, b: 255};
+            } : { r: 255, g: 255, b: 255 };
         };
-        
+
         const rgb = hexToRgb(color);
         const rgbString = `${rgb.r}, ${rgb.g}, ${rgb.b}`;
-        
+
         // Assombrir les couleurs claires pour meilleure lisibilité
         const getDarkerColor = (hex) => {
             const r = parseInt(hex.slice(1, 3), 16);
@@ -193,22 +193,22 @@ function createICULayer(data, icuAttribute) {
             }
             return hex;
         };
-        
+
         const textColor = deltaT != null ? getDarkerColor(color) : '#999';
-        
+
         // Get commune info if available
         const communeName = e.layer.properties.nom_offici || null;
         const codeInsee = e.layer.properties.code_insee || null;
-        const communeInfo = (communeName && codeInsee) 
+        const communeInfo = (communeName && codeInsee)
             ? `<div class="popup-location">
-                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                       <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                       <circle cx="12" cy="10" r="3"/>
-                   </svg>
-                   <span><strong>${communeName}</strong> • ${codeInsee}</span>
-               </div>`
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                </svg>
+                <span><strong>${communeName}</strong> • ${codeInsee}</span>
+            </div>`
             : '';
-        
+
         L.popup({
             className: 'icu-custom-popup',
             closeButton: true,
@@ -245,7 +245,7 @@ function createICULayer(data, icuAttribute) {
             `)
             .openOn(map);
     });
-    
+
     icuLayer.addTo(map);
 }
 
@@ -256,15 +256,15 @@ function createICULayer(data, icuAttribute) {
 function updateStats(geojsonData, attribute) {
     const statsLoading = document.getElementById('statsLoading');
     const statsContent = document.getElementById('statsContent');
-    
+
     if (statsLoading) statsLoading.style.display = 'flex';
     if (statsContent) statsContent.style.display = 'none';
-    
+
     // Calculer les statistiques avec un léger délai
     setTimeout(() => {
         const stats = calculateICUStats(geojsonData, attribute);
         const totalArea = Object.values(stats).reduce((sum, item) => sum + item.area, 0);
-        
+
         // Calculer la température moyenne pondérée
         let sumWeighted = 0;
         let sumArea = 0;
@@ -285,20 +285,20 @@ function updateStats(geojsonData, attribute) {
             }
         });
         const avgTemp = sumArea > 0 ? sumWeighted / sumArea : 0;
-        
+
         // Mettre à jour les résumés
         document.getElementById('totalArea').textContent = `${formatNumber(totalArea, 0)} ha`;
         document.getElementById('avgTemp').textContent = `${avgTemp.toFixed(2)}°C`;
-        
+
         // Préparer les données pour le graphique
         const chartData = prepareChartData(stats, 'icu');
-        
+
         // Créer/Mettre à jour le graphique
         renderICUChart(chartData);
-        
+
         // Remplir le tableau
         fillICUStatsTable(stats, totalArea);
-        
+
         if (statsLoading) statsLoading.style.display = 'none';
         if (statsContent) statsContent.style.display = 'block';
     }, 100);
@@ -307,14 +307,14 @@ function updateStats(geojsonData, attribute) {
 function renderICUChart(chartData) {
     const canvas = document.getElementById('icuChart');
     if (!canvas) return;
-    
+
     const ctx = canvas.getContext('2d');
-    
+
     // Détruire l'ancien graphique s'il existe
     if (icuChart) {
         icuChart.destroy();
     }
-    
+
     icuChart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -336,7 +336,7 @@ function renderICUChart(chartData) {
                 },
                 tooltip: {
                     callbacks: {
-                        label: function(context) {
+                        label: function (context) {
                             return `${context.parsed.y} ha`;
                         }
                     }
@@ -364,18 +364,18 @@ function renderICUChart(chartData) {
 function fillICUStatsTable(stats, totalArea) {
     const tbody = document.getElementById('statsTableBody');
     if (!tbody) return;
-    
+
     tbody.innerHTML = '';
-    
+
     // Ordre logique : du froid au chaud
     const orderedClasses = ['Très froid', 'Froid', 'Frais', 'Neutre', 'Chaud', 'Très chaud', 'Extrême'];
-    
+
     orderedClasses.forEach(className => {
         const value = stats[className];
         if (!value || value.area === 0) return;
-        
+
         const percentage = ((value.area / totalArea) * 100).toFixed(1);
-        
+
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>
@@ -409,15 +409,15 @@ fetch('../data/COMMUNES_PNR.geojson')
 
 function searchCommunes(query) {
     if (!communesData || !query) return [];
-    
+
     const normalizedQuery = query.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    
+
     return communesData
         .filter(feature => {
             const nom = feature.properties.nom_offici || '';
             const codeInsee = feature.properties.code_insee || '';
             const normalizedNom = nom.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-            
+
             return normalizedNom.includes(normalizedQuery) || codeInsee.includes(query);
         })
         .sort((a, b) => {
@@ -434,21 +434,21 @@ function searchCommunes(query) {
 // - Old format: consolidated MultiPolygon without commune attributes
 function filterDataByCommune(geojsonData, communeName) {
     if (!geojsonData || !communeName) return geojsonData;
-    
+
     // Check if data has commune attributes (new format from QGIS intersection)
-    const hasCommuneAttribute = geojsonData.features.length > 0 && 
-                                 geojsonData.features[0].properties && 
-                                 'nom_offici' in geojsonData.features[0].properties;
-    
+    const hasCommuneAttribute = geojsonData.features.length > 0 &&
+        geojsonData.features[0].properties &&
+        'nom_offici' in geojsonData.features[0].properties;
+
     if (hasCommuneAttribute) {
         // New format: simple attribute filtering (fast and precise!)
         console.log('Using new format (QGIS intersection) - filtering by nom_offici');
-        const filteredFeatures = geojsonData.features.filter(feature => 
+        const filteredFeatures = geojsonData.features.filter(feature =>
             feature.properties.nom_offici === communeName
         );
-        
+
         console.log(`Filtered: ${filteredFeatures.length} features for ${communeName}`);
-        
+
         return {
             type: 'FeatureCollection',
             features: filteredFeatures
@@ -468,10 +468,10 @@ function selectCommune(feature) {
     if (dimOverlay) {
         map.removeLayer(dimOverlay);
     }
-    
+
     // Create inverted mask (world polygon with commune as hole)
     const worldBounds = [[-90, -180], [-90, 180], [90, 180], [90, -180], [-90, -180]];
-    
+
     // Extract commune coordinates (support MultiPolygon)
     let communeHoles = [];
     if (feature.geometry.type === 'Polygon') {
@@ -480,13 +480,13 @@ function selectCommune(feature) {
         // For MultiPolygon, take all polygon coordinates
         communeHoles = feature.geometry.coordinates.flat(1);
     }
-    
+
     // Create polygon with holes (world minus commune)
     const maskGeometry = {
         type: 'Polygon',
         coordinates: [worldBounds, ...communeHoles]
     };
-    
+
     dimOverlay = L.geoJSON(maskGeometry, {
         style: {
             color: 'transparent',
@@ -496,12 +496,12 @@ function selectCommune(feature) {
         },
         pane: 'overlayPane'  // Place it in overlayPane, below the ICU layer
     }).addTo(map);
-    
+
     // Ensure ICU layer is on top
     if (icuLayer) {
         icuLayer.bringToFront();
     }
-    
+
     // Add commune boundary on top
     selectedCommuneLayer = L.geoJSON(feature, {
         style: {
@@ -512,25 +512,25 @@ function selectCommune(feature) {
             interactive: false
         }
     }).addTo(map);
-    
+
     // Zoom to bounds
     const bounds = selectedCommuneLayer.getBounds();
     map.fitBounds(bounds, { padding: [50, 50] });
-    
+
     // Clear search input and suggestions
     const searchInput = document.getElementById('searchInput');
     const suggestionsList = document.getElementById('suggestionsList');
     searchInput.value = feature.properties.nom_offici;
     suggestionsList.innerHTML = '';
     suggestionsList.style.display = 'none';
-    
+
     // Filter statistics by commune (if data format supports it)
     if (currentData) {
         const communeName = feature.properties.nom_offici;
         const filteredData = filterDataByCommune(currentData, communeName);
         const currentAttribute = 'ICU_theori';
         updateStats(filteredData, currentAttribute);
-        
+
         // Update context label
         const contextValue = document.getElementById('statsContextValue');
         if (contextValue) {
@@ -550,21 +550,21 @@ function updateSuggestions() {
     const searchInput = document.getElementById('searchInput');
     const suggestionsList = document.getElementById('suggestionsList');
     const query = searchInput.value.trim();
-    
+
     if (query.length < 2) {
         suggestionsList.innerHTML = '';
         suggestionsList.style.display = 'none';
         return;
     }
-    
+
     const results = searchCommunes(query);
-    
+
     if (results.length === 0) {
         suggestionsList.innerHTML = '<div class="suggestion-item no-result">Aucune commune trouvée</div>';
         suggestionsList.style.display = 'block';
         return;
     }
-    
+
     suggestionsList.innerHTML = results.map(feature => {
         const nom = feature.properties.nom_offici;
         const codeInsee = feature.properties.code_insee;
@@ -575,9 +575,9 @@ function updateSuggestions() {
             </div>
         `;
     }).join('');
-    
+
     suggestionsList.style.display = 'block';
-    
+
     // Add click handlers
     suggestionsList.querySelectorAll('.suggestion-item').forEach(item => {
         if (!item.classList.contains('no-result')) {
@@ -598,24 +598,24 @@ function resetSelection() {
         map.removeLayer(dimOverlay);
         dimOverlay = null;
     }
-    
+
     const searchInput = document.getElementById('searchInput');
     const suggestionsList = document.getElementById('suggestionsList');
     searchInput.value = '';
     suggestionsList.innerHTML = '';
     suggestionsList.style.display = 'none';
-    
+
     if (pnrLayer) {
         map.fitBounds(pnrLayer.getBounds());
     } else {
         map.setView([48.9, 7.4], 11);
     }
-    
+
     // Reset statistics to full PNR
     if (currentData) {
         const currentAttribute = 'ICU_theori';
         updateStats(currentData, currentAttribute);
-        
+
         // Update context label
         const contextValue = document.getElementById('statsContextValue');
         if (contextValue) {
@@ -646,7 +646,7 @@ const suggestionsList = document.getElementById('suggestionsList');
 if (searchInput) {
     searchInput.addEventListener('input', updateSuggestions);
     searchInput.addEventListener('focus', updateSuggestions);
-    
+
     // Close suggestions on click outside
     document.addEventListener('click', (e) => {
         if (!searchInput.contains(e.target) && !suggestionsList.contains(e.target)) {
@@ -697,13 +697,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const opacityValue = document.getElementById('opacityValue');
     const basemapToggle = document.getElementById('basemapToggle');
     const basemapLabel = document.getElementById('basemapLabel');
-    
+
     // Opacity Control
     if (opacitySlider && opacityValue) {
         opacitySlider.addEventListener('input', (e) => {
             currentOpacity = e.target.value / 100;
             opacityValue.textContent = `${e.target.value}%`;
-            
+
             // Changer directement l'opacité de la couche
             if (icuLayer && icuLayer.setOpacity) {
                 icuLayer.setOpacity(currentOpacity);
@@ -712,11 +712,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    
+
     // Basemap Toggle Control
     if (basemapToggle && basemapLabel && map._baseLayers) {
         const basemapIcon = document.getElementById('basemapIcon');
-        
+
         basemapToggle.addEventListener('click', () => {
             if (map._currentBaseLayer === 'light') {
                 // Switch to satellite
@@ -739,7 +739,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     basemapIcon.innerHTML = '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>';
                 }
             }
-            
+
             // Remettre les couches au-dessus du fond de carte
             if (pnrLayer) pnrLayer.bringToFront();
             if (icuLayer) icuLayer.bringToFront();

@@ -14,13 +14,13 @@ function updateScrollProgress() {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
     const progress = (scrollTop / scrollHeight) * 100;
-    
+
     if (!progressBar) {
         progressBar = document.createElement('div');
         progressBar.className = 'scroll-progress';
         document.body.appendChild(progressBar);
     }
-    
+
     progressBar.style.width = `${progress}%`;
 }
 
@@ -36,11 +36,6 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 
 // ==================================================
-// 2. FADE IN SIMPLE AU SCROLL
-// ==================================================
-// Animations simplifiées pour un aspect plus professionnel
-
-// ==================================================
 // 3. BOUTON RETOUR EN HAUT
 // ==================================================
 
@@ -50,12 +45,12 @@ function initScrollToTop() {
     btn.innerHTML = '↑';
     btn.setAttribute('aria-label', 'Retour en haut');
     document.body.appendChild(btn);
-    
+
     // Toggle visibilité au scroll
     window.addEventListener('scroll', () => {
         btn.classList.toggle('visible', window.pageYOffset > 300);
     }, { passive: true });
-    
+
     // Scroll smooth vers le haut
     btn.addEventListener('click', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -75,7 +70,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', (e) => {
         const href = anchor.getAttribute('href');
         if (href === '#' || href.length <= 1) return;
-        
+
         const target = document.querySelector(href);
         if (target) {
             e.preventDefault();
@@ -127,7 +122,7 @@ if (cardsGrid) {
             transition: 'opacity 0.4s ease, transform 0.4s ease'
         });
     });
-    
+
     // Observer la grille
     const cardObserver = new IntersectionObserver(
         (entries) => {
@@ -145,7 +140,7 @@ if (cardsGrid) {
         },
         { threshold: 0.2 }
     );
-    
+
     cardObserver.observe(cardsGrid);
 }
 
@@ -164,7 +159,7 @@ if (objectivesGrid) {
             transition: 'opacity 0.5s ease, transform 0.5s ease'
         });
     });
-    
+
     const objectivesObserver = new IntersectionObserver(
         (entries) => {
             entries.forEach(entry => {
@@ -181,7 +176,7 @@ if (objectivesGrid) {
         },
         { threshold: 0.1 }
     );
-    
+
     objectivesObserver.observe(objectivesGrid);
 }
 
@@ -189,4 +184,4 @@ if (objectivesGrid) {
 // INITIALISATION COMPLÈTE
 // ==================================================
 
-console.log('🎨 Animations landing page initialisées');
+console.log('Animations landing page initialisées');
