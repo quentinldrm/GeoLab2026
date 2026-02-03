@@ -11,7 +11,7 @@ _Master 2 OTG (Geomatics and Territorial Engineering) • University of Strasbou
 
 This project provides an **interactive web platform** for visualizing and analyzing Local Climate Zones (LCZ) in the Regional Natural Park of the Northern Vosges (PNR Vosges du Nord). The platform enables the exploration of urban and natural thermal structures through standardized climate classification, with temporal analysis capabilities spanning 2015 to 2025.
 
-The project was developed as part of the **GeoLAB 2026** initiative at the University of Strasbourg, focusing on climate analysis and sustainable territorial planning in the context of climate change.
+The project was developed as part of the **GeoLAB 2026** initiative at the University of Strasbourg, focusing on conduct a scientific project.
 
 ---
 
@@ -123,7 +123,7 @@ Understanding the thermal structure of this territory through LCZ analysis is cr
 
 ---
 
-## Getting Started
+## Getting Started (for local deployment)
 
 ### Prerequisites
 
