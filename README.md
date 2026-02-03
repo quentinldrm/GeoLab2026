@@ -1,6 +1,5 @@
 # Local Climate Zones (LCZ) - Regional Natural Park of the Northern Vosges
 
-![PNR Vosges du Nord](pictures/logo_pnr.webp)
 
 **Interactive mapping and climate analysis of the Regional Natural Park of the Northern Vosges**  
 _Master 2 OTG (Geomatics and Territorial Engineering) • University of Strasbourg • 2025-2026_
