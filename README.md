@@ -4,6 +4,7 @@
 **Interactive mapping and climate analysis of the Regional Natural Park of the Northern Vosges**  
 _Master 2 OTG (Geomatics and Territorial Engineering) • University of Strasbourg • 2025-2026_
 
+Live demo : https://quentinldrm.github.io/GeoLab2026/
 ---
 
 ## Summary
