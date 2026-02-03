@@ -4,6 +4,7 @@
 _Master 2 OTG (Geomatics and Earth Observation) • University of Strasbourg • 2025-2026_
 
 **Live demo**: https://quentinldrm.github.io/GeoLab2026/
+
 ---
 
 ## Summary
