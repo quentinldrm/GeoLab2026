@@ -1,10 +1,9 @@
 # Local Climate Zones (LCZ) - Regional Natural Park of the Northern Vosges
 
-
 **Interactive mapping and climate analysis of the Regional Natural Park of the Northern Vosges**  
-_Master 2 OTG (Geomatics and Territorial Engineering) • University of Strasbourg • 2025-2026_
+_Master 2 OTG (Geomatics and Earth Observation) • University of Strasbourg • 2025-2026_
 
-Live demo : https://quentinldrm.github.io/GeoLab2026/
+**Live demo**: https://quentinldrm.github.io/GeoLab2026/
 ---
 
 ## Summary
@@ -27,19 +26,19 @@ The platform offers three main modules:
 - Detailed information for each LCZ class with climate characteristics
 - Progressive loading system for optimal performance
 
-### 2. **Temporal Comparison** (`/compare`)
-
-- Side-by-side visualization of two time periods (2015 vs 2020, 2015 vs 2025, 2020 vs 2025)
-- Statistical analysis of LCZ evolution over time
-- Interactive charts showing surface area changes by LCZ class
-- Synchronized map navigation for easy comparison
-
-### 3. **Urban Heat Island Analysis** (`/icu`)
+### 2. **Urban Heat Island Analysis** (`/icu`)
 
 - Visualization of heat island intensity by municipality
 - Graduated color mapping based on thermal intensity
 - Detailed statistics for each municipality
 - Integration with LCZ data for comprehensive climate understanding
+
+- ### 3. **Temporal Comparison** (`/compare`)
+
+- Side-by-side visualization of two time periods (2015 vs 2020, 2015 vs 2025, 2020 vs 2025)
+- Statistical analysis of LCZ evolution over time
+- Interactive charts showing surface area changes by LCZ class
+- Synchronized map navigation for easy comparison
 
 ---
 
