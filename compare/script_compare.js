@@ -18,6 +18,14 @@ let pnrLayer = null;
 const mapCenter = [48.9, 7.4];
 const mapZoom = 11;
 
+// Helper function to get display label for years
+function getDisplayLabel(year) {
+    if (year === '2025_RF') return 'RF';
+    if (year === 'WUDAPT') return 'WUDAPT';
+    if (year === '2025_Grid') return 'Grid 100m';
+    return year;
+}
+
 // ==================================================
 // MAPS INITIALIZATION
 // ==================================================
@@ -85,17 +93,37 @@ fetch('../data/PNR_VN_4326.geojson')
 
 function loadLCZLayer(year, mapInstance, isLeft = true) {
     return new Promise((resolve, reject) => {
-        const source = year === '2025_RF' ? 'rf' : 'geoclimate';
-        const actualYear = year === '2025_RF' ? '2025' : year;
-        const filename = source === 'rf'
-            ? `../data/LCZ${actualYear}_RF_4326.geojson.gz`
-            : `../data/LCZ${actualYear}_4326.geojson.gz`;
-        const lczAttribute = source === 'rf' ? 'LCZ' : 'LCZ_PRIMAR';
-        const cacheKey = `${actualYear}_${source}`;
+        let source, actualYear, filename, lczAttribute, cacheKey;
+
+        if (year === 'WUDAPT') {
+            source = 'wudapt';
+            actualYear = 'WUDAPT';
+            filename = '../data/LCZ_WUDAPT.geojson.gz';
+            lczAttribute = 'LCZ';
+            cacheKey = 'wudapt';
+        } else if (year === '2025_Grid') {
+            source = 'grid';
+            actualYear = '2025_Grid';
+            filename = '../data/LCZ2025_GRID.geojson.gz';
+            lczAttribute = 'LCZ';
+            cacheKey = '2025_grid';
+        } else if (year === '2025_RF') {
+            source = 'rf';
+            actualYear = '2025';
+            filename = '../data/LCZ2025_RF_4326.geojson.gz';
+            lczAttribute = 'LCZ';
+            cacheKey = '2025_rf';
+        } else {
+            source = 'geoclimate';
+            actualYear = year;
+            filename = `../data/LCZ${year}_4326.geojson.gz`;
+            lczAttribute = 'LCZ_PRIMAR';
+            cacheKey = `${year}_geoclimate`;
+        }
 
         window.geojsonLoader.loadGeoJSON(filename, cacheKey)
             .then(data => {
-                const layer = createVectorLayer(data, lczAttribute, mapInstance);
+                const layer = createVectorLayer(data, lczAttribute, mapInstance, source);
                 resolve(layer);
             })
             .catch(err => {
@@ -106,7 +134,7 @@ function loadLCZLayer(year, mapInstance, isLeft = true) {
 }
 
 // Fonction pour créer une couche vectorielle
-function createVectorLayer(data, lczAttribute, mapInstance) {
+function createVectorLayer(data, lczAttribute, mapInstance, source = 'geoclimate') {
     // Tolérance dynamique selon le niveau de zoom
     const zoom = mapInstance.getZoom();
     const tolerance = zoom > 14 ? 5 : zoom > 12 ? 8 : 12;
@@ -124,7 +152,13 @@ function createVectorLayer(data, lczAttribute, mapInstance) {
         },
         vectorTileLayerStyles: {
             sliced: properties => {
-                const lczValue = properties[lczAttribute];
+                let lczValue = properties[lczAttribute];
+
+                // Conversion WUDAPT : LCZ naturelles (11->101, 12->102, etc.)
+                if (source === 'wudapt' && lczValue >= 11 && lczValue <= 17) {
+                    lczValue = lczValue + 90; // 11->101, 12->102, ..., 17->107
+                }
+
                 const style = MapUtils.getLCZStyle(lczValue);
                 style.stroke = false;
                 style.weight = 0;
@@ -134,7 +168,13 @@ function createVectorLayer(data, lczAttribute, mapInstance) {
     });
 
     layer.on('click', e => {
-        const lczValue = e.layer.properties[lczAttribute];
+        let lczValue = e.layer.properties[lczAttribute];
+
+        // Conversion WUDAPT : LCZ naturelles (11->101, 12->102, etc.)
+        if (source === 'wudapt' && lczValue >= 11 && lczValue <= 17) {
+            lczValue = lczValue + 90; // 11->101, 12->102, ..., 17->107
+        }
+
         const name = MapUtils.lczNames[lczValue] || 'Non classé';
         const color = MapUtils.lczColors[lczValue] || '#808080';
         const lczDisplay = lczValue >= 100 ? String.fromCharCode(64 + lczValue - 100) : lczValue;
@@ -558,8 +598,11 @@ function updateCompareStats() {
     if (statsContent) statsContent.style.display = 'none';
 
     setTimeout(() => {
-        const leftAttr = currentLeftYear === '2025_RF' ? 'LCZ' : 'LCZ_PRIMAR';
-        const rightAttr = currentRightYear === '2025_RF' ? 'LCZ' : 'LCZ_PRIMAR';
+        // Déterminer l'attribut LCZ selon la source
+        const leftAttr = (currentLeftYear === '2025_RF' || currentLeftYear === 'WUDAPT' || currentLeftYear === '2025_Grid') ? 'LCZ' : 'LCZ_PRIMAR';
+        const rightAttr = (currentRightYear === '2025_RF' || currentRightYear === 'WUDAPT' || currentRightYear === '2025_Grid') ? 'LCZ' : 'LCZ_PRIMAR';
+        const leftSource = currentLeftYear === 'WUDAPT' ? 'wudapt' : (currentLeftYear === '2025_Grid' ? 'grid' : 'geoclimate');
+        const rightSource = currentRightYear === 'WUDAPT' ? 'wudapt' : (currentRightYear === '2025_Grid' ? 'grid' : 'geoclimate');
 
         // Filter by commune if selected
         let leftDataToUse = leftGeojsonData;
@@ -591,8 +634,8 @@ function updateCompareStats() {
             }
         }
 
-        const leftStats = calculateStats(leftDataToUse, leftAttr);
-        const rightStats = calculateStats(rightDataToUse, rightAttr);
+        const leftStats = calculateStats(leftDataToUse, leftAttr, leftSource);
+        const rightStats = calculateStats(rightDataToUse, rightAttr, rightSource);
 
         const leftTotal = getTotalArea(leftStats);
         const rightTotal = getTotalArea(rightStats);
@@ -604,8 +647,8 @@ function updateCompareStats() {
                 let contextText = selectedCommuneName;
                 if (!leftHasCommune || !rightHasCommune) {
                     const missingYears = [];
-                    if (!leftHasCommune) missingYears.push(currentLeftYear === '2025_RF' ? 'RF' : currentLeftYear);
-                    if (!rightHasCommune) missingYears.push(currentRightYear === '2025_RF' ? 'RF' : currentRightYear);
+                    if (!leftHasCommune) missingYears.push(getDisplayLabel(currentLeftYear));
+                    if (!rightHasCommune) missingYears.push(getDisplayLabel(currentRightYear));
                     contextText += ` ⚠️ (${missingYears.join(', ')} : données consolidées - filtrage impossible)`;
                 }
                 statsContextValue.textContent = contextText;
@@ -617,14 +660,10 @@ function updateCompareStats() {
         // Update summary
         document.getElementById('leftTotalArea').textContent = `${formatNumber(leftTotal, 0)} ha`;
         document.getElementById('rightTotalArea').textContent = `${formatNumber(rightTotal, 0)} ha`;
-        document.getElementById('leftYearLabel').textContent = currentLeftYear === '2025_RF' ? 'RF' : currentLeftYear;
-        document.getElementById('rightYearLabel').textContent = currentRightYear === '2025_RF' ? 'RF' : currentRightYear;
-        document.getElementById('tableLeftYear').textContent = currentLeftYear === '2025_RF' ? 'RF' : currentLeftYear;
-        document.getElementById('tableRightYear').textContent = currentRightYear === '2025_RF' ? 'RF' : currentRightYear;
-
-        // Update chart
-        renderCompareChart(leftStats, rightStats);
-
+        document.getElementById('leftYearLabel').textContent = getDisplayLabel(currentLeftYear);
+        document.getElementById('rightYearLabel').textContent = getDisplayLabel(currentRightYear);
+        document.getElementById('tableLeftYear').textContent = getDisplayLabel(currentLeftYear);
+        document.getElementById('tableRightYear').textContent = getDisplayLabel(currentRightYear);
         // Update table
         fillCompareTable(leftStats, rightStats);
 
@@ -662,8 +701,8 @@ function renderCompareChart(leftStats, rightStats) {
         compareChart.destroy();
     }
 
-    const leftYearLabel = currentLeftYear === '2025_RF' ? 'RF' : currentLeftYear;
-    const rightYearLabel = currentRightYear === '2025_RF' ? 'RF' : currentRightYear;
+    const leftYearLabel = getDisplayLabel(currentLeftYear);
+    const rightYearLabel = getDisplayLabel(currentRightYear);
 
     compareChart = new Chart(canvas, {
         type: 'bar',
@@ -772,12 +811,29 @@ function fillCompareTable(leftStats, rightStats) {
 
 // Load geojson data for stats
 async function loadGeojsonForStats(year) {
-    const source = year === '2025_RF' ? 'rf' : 'geoclimate';
-    const actualYear = year === '2025_RF' ? '2025' : year;
-    const filename = source === 'rf'
-        ? `../data/LCZ${actualYear}_RF_4326.geojson.gz`
-        : `../data/LCZ${actualYear}_4326.geojson.gz`;
-    const cacheKey = `${actualYear}_${source}`;
+    let source, actualYear, filename, cacheKey;
+
+    if (year === 'WUDAPT') {
+        source = 'wudapt';
+        actualYear = 'WUDAPT';
+        filename = '../data/LCZ_WUDAPT.geojson.gz';
+        cacheKey = 'wudapt';
+    } else if (year === '2025_Grid') {
+        source = 'grid';
+        actualYear = '2025_Grid';
+        filename = '../data/LCZ2025_GRID.geojson.gz';
+        cacheKey = '2025_grid';
+    } else if (year === '2025_RF') {
+        source = 'rf';
+        actualYear = '2025';
+        filename = '../data/LCZ2025_RF_4326.geojson.gz';
+        cacheKey = '2025_rf';
+    } else {
+        source = 'geoclimate';
+        actualYear = year;
+        filename = `../data/LCZ${year}_4326.geojson.gz`;
+        cacheKey = `${year}_geoclimate`;
+    }
 
     try {
         // Utiliser le même loader que pour les cartes
@@ -810,8 +866,8 @@ async function updateMapsWithStats() {
         if (rightLayer) rightLayer.addTo(mapRight);
 
         // Update year displays
-        document.getElementById('leftYearDisplay').textContent = currentLeftYear === '2025_RF' ? 'RF' : currentLeftYear;
-        document.getElementById('rightYearDisplay').textContent = currentRightYear === '2025_RF' ? 'RF' : currentRightYear;
+        document.getElementById('leftYearDisplay').textContent = getDisplayLabel(currentLeftYear);
+        document.getElementById('rightYearDisplay').textContent = getDisplayLabel(currentRightYear);
 
         // Update stats
         updateCompareStats();
