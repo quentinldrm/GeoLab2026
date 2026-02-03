@@ -805,6 +805,10 @@ async function updateMapsWithStats() {
             loadGeojsonForStats(currentRightYear)
         ]);
 
+        // Add layers to maps
+        if (leftLayer) leftLayer.addTo(mapLeft);
+        if (rightLayer) rightLayer.addTo(mapRight);
+
         // Update year displays
         document.getElementById('leftYearDisplay').textContent = currentLeftYear === '2025_RF' ? 'RF' : currentLeftYear;
         document.getElementById('rightYearDisplay').textContent = currentRightYear === '2025_RF' ? 'RF' : currentRightYear;
