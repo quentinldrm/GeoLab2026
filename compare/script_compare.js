@@ -555,6 +555,14 @@ function toggleWidget(widgetId) {
         widgetContainer.classList.remove('collapsed');
         if (toggleIcon) toggleIcon.textContent = '▲';
         if (widget) widget.style.display = 'block';
+        // If a chart exists, resize it after making the container visible
+        setTimeout(() => {
+            try {
+                if (compareChart && typeof compareChart.resize === 'function') compareChart.resize();
+            } catch (err) {
+                console.warn('Chart resize failed:', err);
+            }
+        }, 120);
     } else {
         widgetContainer?.classList.add('collapsed');
         if (toggleIcon) toggleIcon.textContent = '▼';
@@ -666,6 +674,13 @@ function updateCompareStats() {
         document.getElementById('tableRightYear').textContent = getDisplayLabel(currentRightYear);
         // Update table
         fillCompareTable(leftStats, rightStats);
+
+        // Render chart (try/catch to avoid breaking UI on errors)
+        try {
+            renderCompareChart(leftStats, rightStats);
+        } catch (err) {
+            console.error('Error rendering compare chart:', err);
+        }
 
         if (statsLoading) statsLoading.style.display = 'none';
         if (statsContent) statsContent.style.display = 'block';
